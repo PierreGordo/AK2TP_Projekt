@@ -22,6 +22,7 @@ name = "ak2tp-projekt"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "dioxus-primitives",
 ]
 
 [[package]]
@@ -161,6 +162,12 @@ dependencies = [
  "tower-layer",
  "tower-service",
 ]
+
+[[package]]
+name = "base16"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d27c3610c36aee21ce8ac510e6224498de4228ad772a171ed65643a24693a5a8"
 
 [[package]]
 name = "base64"
@@ -752,6 +759,7 @@ dependencies = [
  "dioxus-hooks",
  "dioxus-html",
  "dioxus-logger",
+ "dioxus-router",
  "dioxus-signals",
  "dioxus-stores",
  "dioxus-web",
@@ -779,6 +787,17 @@ dependencies = [
  "tokio",
  "wasm-bindgen-futures",
  "web-sys",
+]
+
+[[package]]
+name = "dioxus-attributes"
+version = "0.1.0"
+source = "git+https://github.com/DioxusLabs/components#3c3b692abb4edd05340b98b3b3de13378a6fc40a"
+dependencies = [
+ "dioxus-rsx",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -875,7 +894,7 @@ dependencies = [
  "global-hotkey",
  "infer",
  "jni 0.21.1",
- "lazy-js-bundle",
+ "lazy-js-bundle 0.7.3",
  "libc",
  "muda",
  "ndk",
@@ -944,7 +963,7 @@ dependencies = [
  "futures-channel",
  "futures-util",
  "generational-box",
- "lazy-js-bundle",
+ "lazy-js-bundle 0.7.3",
  "serde",
  "serde_json",
  "tracing",
@@ -1094,7 +1113,7 @@ dependencies = [
  "futures-util",
  "generational-box",
  "keyboard-types",
- "lazy-js-bundle",
+ "lazy-js-bundle 0.7.3",
  "rustversion",
  "serde",
  "serde_json",
@@ -1124,7 +1143,7 @@ dependencies = [
  "dioxus-core-types",
  "dioxus-html",
  "js-sys",
- "lazy-js-bundle",
+ "lazy-js-bundle 0.7.3",
  "rustc-hash 2.1.1",
  "serde",
  "sledgehammer_bindgen",
@@ -1147,6 +1166,56 @@ dependencies = [
 ]
 
 [[package]]
+name = "dioxus-primitives"
+version = "0.0.1"
+source = "git+https://github.com/DioxusLabs/components#3c3b692abb4edd05340b98b3b3de13378a6fc40a"
+dependencies = [
+ "dioxus",
+ "dioxus-attributes",
+ "dioxus-sdk-time",
+ "lazy-js-bundle 0.6.2",
+ "num-integer",
+ "serde",
+ "time",
+ "tracing",
+]
+
+[[package]]
+name = "dioxus-router"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d5b31f9e27231389bf5a117b7074d22d8c58358b484a2558e56fbab20e64ca4"
+dependencies = [
+ "dioxus-cli-config",
+ "dioxus-core",
+ "dioxus-core-macro",
+ "dioxus-history",
+ "dioxus-hooks",
+ "dioxus-html",
+ "dioxus-router-macro",
+ "dioxus-signals",
+ "percent-encoding",
+ "rustversion",
+ "tracing",
+ "url",
+]
+
+[[package]]
+name = "dioxus-router-macro"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "838b9b441a95da62b39cae4defd240b5ebb0ec9f2daea1126099e00a838dc86f"
+dependencies = [
+ "base16",
+ "digest",
+ "proc-macro2",
+ "quote",
+ "sha2",
+ "slab",
+ "syn 2.0.117",
+]
+
+[[package]]
 name = "dioxus-rsx"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1157,6 +1226,18 @@ dependencies = [
  "quote",
  "rustversion",
  "syn 2.0.117",
+]
+
+[[package]]
+name = "dioxus-sdk-time"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "80c25ae93a3f72e734873b97fbd09d9b1b6adff97205fb0ffd8543e3564fb78e"
+dependencies = [
+ "dioxus",
+ "futures",
+ "gloo-timers",
+ "tokio",
 ]
 
 [[package]]
@@ -1219,7 +1300,7 @@ dependencies = [
  "generational-box",
  "gloo-timers",
  "js-sys",
- "lazy-js-bundle",
+ "lazy-js-bundle 0.7.3",
  "rustc-hash 2.1.1",
  "send_wrapper",
  "serde",
@@ -2448,6 +2529,12 @@ dependencies = [
 
 [[package]]
 name = "lazy-js-bundle"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e49596223b9d9d4947a14a25c142a6e7d8ab3f27eb3ade269d238bb8b5c267e2"
+
+[[package]]
+name = "lazy-js-bundle"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c7b88b715ab1496c6e6b8f5e927be961c4235196121b6ae59bcb51077a21dd36"
@@ -2873,6 +2960,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf97ec579c3c42f953ef76dbf8d55ac91fb219dde70e49aa4a6b7d74e9919050"
 
 [[package]]
+name = "num-integer"
+version = "0.1.46"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "num-traits"
 version = "0.2.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2901,6 +2997,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.117",
+]
+
+[[package]]
+name = "num_threads"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c7398b9c8b70908f6371f47ed36737907c87c52af34c268fed0bf0ceb92ead9"
+dependencies = [
+ "libc",
 ]
 
 [[package]]
@@ -4478,7 +4583,9 @@ checksum = "743bd48c283afc0388f9b8827b976905fb217ad9e647fae3a379a9283c4def2c"
 dependencies = [
  "deranged",
  "itoa",
+ "libc",
  "num-conv",
+ "num_threads",
  "powerfmt",
  "serde_core",
  "time-core",
