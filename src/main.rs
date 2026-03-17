@@ -108,6 +108,13 @@ fn Rodne_cislo() -> Element {
     let mut input_value = use_signal(|| String::new());
     //placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
     let mut calculated_control_digit = use_signal(|| " ‌‌‌".to_string());
+	//na manipulování toho zda je viditelný infobox, či ne - buď "opacity-100 scale-100 visible" nebo "opacity-0 scale-95 invisible"
+	let mut visibility_state = use_signal(|| String::from("opacity-0 scale-95 invisible"));
+	//potřebuju znova kontrol digit, je to hloupé, ano -> udělam to? také ano, protoze to bude fungovat
+	let mut calculated_control_digit_second = use_signal(|| " ‌‌‌".to_string());
+	//potebuji znova input value, protože jinak to spolu fajtí a je to na houby - opět hloupá věc, ale co mám dělat :((
+	let mut input_value_valid_code = use_signal(|| String::new());
+    
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
 
@@ -127,17 +134,23 @@ fn Rodne_cislo() -> Element {
 
                     div { class: "form-control w-full",
                         label { class: "label",
-                            span { class: "label-text font-semibold", "Vložte datový základ (bez kontrolní číslice)" }
+                            span { class: "label-text font-semibold", "Vložte datový základ (buď bez kontrolní číslice, nebo s ní pro kontrolu rodného čísla)" }
                         }
                         input {
                             r#type: "text",
                             placeholder: "Např: 980215423",
                             class: "input input-bordered input-primary input-lg w-full font-mono",
+                            //this could fix my problems
+                            maxlength: "10",
                             value: "{input_value}",
                             oninput: move |evt|
-                                    {
+                                    {                                   	
                                     input_value.set(evt.value());
                                     //trigger when rodné číslo is the corrent len
+                                    //make the infobox warning go invisible, when user types in again, has to be at the top, because if at the bottom, it overrides the 
+                                    //command to make it visible
+                                    visibility_state.set(String::from("opacity-0 scale-95 invisible"));
+                                    input_value_valid_code.set(evt.value());
                                     match input_value.len()
                                     {
                                     9 =>
@@ -149,6 +162,7 @@ fn Rodne_cislo() -> Element {
                                                 //representing the calculated value as String seems like a better idea
                                                 Some(val) => {let calculated_control_digit_int: i32 = val;
                                                               calculated_control_digit.set(calculated_control_digit_int.to_string());
+                                                              calculated_control_digit_second.set(calculated_control_digit_int.to_string());
                                                               },
                                                         //Have to use set here, because it is a signal
                                                 None => {calculated_control_digit.set("Neplatné RČ.".to_string());},
@@ -157,6 +171,9 @@ fn Rodne_cislo() -> Element {
                                     //Pokud uživatel zadá celé RČ - provést kontrolu číslice
                                     10 =>
                                     {
+                        					//this is made so that if you enter 10 digit RČ, it does not show up at the end
+                        					//v kompletní valdiní kód políčku
+                        					calculated_control_digit_second.set(" ‌‌‌".to_string());
                                             let result: Option<i32> = algorithms::rc_control_digit(input_value.read().as_str());
 											match result{
 												//Actually now that I think about it, even though my function returns i32
@@ -167,7 +184,12 @@ fn Rodne_cislo() -> Element {
 													calculated_control_digit.set(calculated_control_digit_int.to_string());
 													//Check whether the calculated control number is different to that the user inputted
 													if !input_value.read().ends_with(&calculated_control_digit_int.to_string()){
-														calculated_control_digit.set("Neplatný kontrolní digit RČ".to_string());
+														//This method was incredibly stupid so I am replacing it with a info box warning
+														//calculated_control_digit.set("Neplatný kontrolní digit RČ".to_string());
+														visibility_state.set(String::from("opacity-100 scale-100 visible"));
+														//also would be probably good here to set the Kompletní validní kód, to an acutaally valid code
+														//that is too complex, i will just erase it
+														input_value_valid_code.set(" ‌‌‌".to_string());
 													}
 													},
 												//Have to use set here, because it is a signal
@@ -179,8 +201,15 @@ fn Rodne_cislo() -> Element {
                                     _ => {
                                             //placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
                                             calculated_control_digit.set(" ‌‌‌".to_string());
+                                            calculated_control_digit_second.set(" ‌‌‌".to_string());
                                         }
                                     }
+                                    //Check jestli uživatel skutečně zadává čísla
+                                    if evt.value().trim().parse::<i64>().is_err() && input_value.len() != 0
+                                    {
+                                    	calculated_control_digit.set("Neplatné RČ.".to_string());
+                                    }
+
                             }
                         }
                         label { class: "label",
@@ -208,7 +237,7 @@ fn Rodne_cislo() -> Element {
                 div { class: "stats shadow col-span-2",
                     div { class: "stat",
                         div { class: "stat-title", "Kompletní validní kód" }
-                        div { class: "stat-value tracking-widest", "{input_value}{calculated_control_digit}" } // Je tady zero width chararcte rv tom aby to držel formu !!!! NEMAZAT CO JE ZA IMPUT VALUE !!!!
+                        div { class: "stat-value tracking-widest", "{input_value_valid_code}{calculated_control_digit_second}" } // Je tady zero width chararcte rv tom aby to držel formu !!!! NEMAZAT CO JE ZA IMPUT VALUE !!!!
                         div { class: "stat-actions",
                             button { class: "btn btn-sm btn-success", "Kopírovat" }
                         }
@@ -223,23 +252,42 @@ fn Rodne_cislo() -> Element {
                 div { class: "space-y-4",
                     h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
                     div { class: "mockup-code bg-base-300 text-base-content",
-                        pre { "data-prefix": ">", code { "Krok 1: Součet lichých pozic = 31" } }
-                        pre { "data-prefix": ">", code { "Krok 2: Součet sudých pozic * 3 = 51" } }
-                        pre { "data-prefix": ">", code { "Krok 3: (31 + 51) mod 10 = 2" } }
-                        pre { "data-prefix": ">", class: "text-success", code { "Krok 4: Výsledek = 10 - 2 = 8" } }
+                        pre { "data-prefix": ">", code { "Zbytek po vydělení rodného čísla 11." } }
+                        pre { "data-prefix": ">", code { "V programování se pro tuto operaci používá" } }
+                        pre { "data-prefix": ">", code { "operátor % - modulo." } }
+                        pre { "data-prefix": ">", code { "{input_value} % 11 = {calculated_control_digit}" } }
                     }
                 }
 
-                // Vizualizace (Čárový kód / QR)
-                div { class: "flex flex-col items-center justify-center p-8 bg-white rounded-xl border-2 border-dashed border-base-300",
-                    div { class: "text-center space-y-4",
-                        // Sem přijde vygenerované SVG/PNG čárového kódu
-                        div { class: "w-64 h-32 bg-slate-200 flex items-center justify-center text-slate-400 font-mono",
-                            "Barcode Preview"
-                        }
-                        button { class: "btn btn-outline", "Stáhnout jako PNG" }
-                    }
-                }
+            //Warning pokud se zadá neplatné 10 místné rodné číslo
+			div { class: "space-y-4",
+
+			h3 { class: "text-xl font-bold", "Infobox" }
+			div { 
+			class: "transition-all duration-300 ease-out {visibility_state}",
+			//I have to wrap this infoallert in this div, to make it appearable and reapearrable
+			div {
+	            role: "alert", 
+	            class: "alert alert-warning",
+	            svg {
+	                xmlns: "http://www.w3.org/2000/svg",
+	                class: "h-6 w-6 shrink-0 stroke-current",
+	                fill: "none",
+	                view_box: "0 0 24 24",
+	                path {
+	                    stroke_linecap: "round",
+	                    stroke_linejoin: "round",
+	                    stroke_width: "2",
+	                    d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+	                }
+	            }
+	            span { "Varování: zadali jste rodné číslo s neplatnou kontrolní číslicí!" }
+        	}
+        	}
+        	}
+            
+
+				
             }
         }
     }
