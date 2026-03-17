@@ -2,7 +2,7 @@
 
 //rodne cislo kotrnolní číslice
 //Vstupem je zadané 9 (bez kontrolního čísla na konci) místné rodné číslo: ve stvaru String
-fn rc_control_digit(rodne_cislo: &str) -> Option<i32> {
+pub fn rc_control_digit(rodne_cislo: &str) -> Option<i32> {
 
 	
     if let Ok(val) = rodne_cislo.parse() {

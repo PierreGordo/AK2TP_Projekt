@@ -1,16 +1,9 @@
 use dioxus::prelude::*;
 //for algos
 mod algorithms;
+//for logging - remove later when app complete
+use tracing;
 
-
-//used for transfering between code types
-#[derive(PartialEq, Clone, Copy)]
-enum CodeType {
-    RodneCislo,
-    Isbn13,
-    Ean13,
-    Iban,
-}
 
 
 #[derive(Clone, Debug, PartialEq, Routable)]
@@ -29,6 +22,7 @@ enum Route {
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 fn main() {
+	//for logging - remove later when app complete
     dioxus::launch(|| {
         rsx! {
         //tailwind css
@@ -58,7 +52,7 @@ rsx! {
 
                     h1 { 
                         class: "text-5xl font-bold text-primary mb-6", 
-                        "Generátor a validátor detekčních kódů" 
+                        "Generátor detekčních kódů" 
                     }
                     
 
@@ -120,7 +114,8 @@ fn Rodne_cislo() -> Element {
 	let nav = use_navigator();
     // Stav pro výběr kódu a zadaný vstup
     let mut input_value = use_signal(|| String::new());
-
+	//placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
+	let mut calculated_control_digit = use_signal(||" ‌‌‌".to_string());
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
             
@@ -147,7 +142,30 @@ fn Rodne_cislo() -> Element {
                             placeholder: "Např: 980215423",
                             class: "input input-bordered input-primary input-lg w-full font-mono",
                             value: "{input_value}",
-                            oninput: move |evt| input_value.set(evt.value())
+                            oninput: move |evt| 
+                            		{
+                            		input_value.set(evt.value());
+									//trigger when rodné číslo is the corrent len
+                            		if input_value.len() == 9 {
+                            			// 												input value is type Signal<String> -> .read() unwraps it somehow and .as_str() converts to &str
+                            			let result: Option<i32> = algorithms::rc_control_digit(input_value.read().as_str());
+                            			match result{
+                            				//Actually now that I think about it, even though my function returns i32
+                            				//representing the calculated value as String seems like a better idea
+                            				Some(val) => {let calculated_control_digit_int: i32 = val;
+                            							  calculated_control_digit.set(calculated_control_digit_int.to_string());
+                            							  },
+                            						//Have to use set here, because it is a signal
+                            				None => {calculated_control_digit.set("Neplatné RČ.".to_string());},
+                            				}
+                            			}
+                            		//Zde kontrola, zda je kontrolní číslice platná, pokud zadá uživatel všech 10 čísel
+                            		
+                            		else{
+                            			//placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
+                            			calculated_control_digit.set(" ‌‌‌".to_string());
+                            		}
+                            }
                         }
                         label { class: "label",
                             span { class: "label-text-alt text-base-content/60", 
@@ -165,7 +183,7 @@ fn Rodne_cislo() -> Element {
                 div { class: "stats shadow bg-primary text-primary-content col-span-1",
                     div { class: "stat",
                         div { class: "stat-title text-primary-content/80", "Kontrolní číslice" }
-                        div { class: "stat-value", " ‌‌‌" } // ZDE JE OPET INVISIBLE CHARACTER, NEMAZAT
+                        div { class: "stat-value", "{calculated_control_digit}" } // ZDE JE OPET INVISIBLE CHARACTER, NEMAZAT -> pořád tam je ale přes proměnou
                         div { class: "stat-desc text-primary-content/80", "Vypočteno metodou Modulo 10" }
                     }
                 }
@@ -174,7 +192,7 @@ fn Rodne_cislo() -> Element {
                 div { class: "stats shadow col-span-2",
                     div { class: "stat",
                         div { class: "stat-title", "Kompletní validní kód" }
-                        div { class: "stat-value tracking-widest", "{input_value} ‌‌‌" } // Je tady zero width chararcte rv tom aby to držel formu !!!! NEMAZAT CO JE ZA IMPUT VALUE !!!!
+                        div { class: "stat-value tracking-widest", "{input_value}{calculated_control_digit}" } // Je tady zero width chararcte rv tom aby to držel formu !!!! NEMAZAT CO JE ZA IMPUT VALUE !!!!
                         div { class: "stat-actions",
                             button { class: "btn btn-sm btn-success", "Kopírovat" }
                         }
