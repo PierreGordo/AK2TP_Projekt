@@ -4,8 +4,6 @@ mod algorithms;
 //for logging - remove later when app complete
 use tracing;
 
-
-
 #[derive(Clone, Debug, PartialEq, Routable)]
 enum Route {
     #[route("/")]
@@ -16,13 +14,12 @@ enum Route {
 
     #[route("/rodne_cislo")]
     Rodne_cislo,
-
 }
 
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 fn main() {
-	//for logging - remove later when app complete
+    //for logging - remove later when app complete
     dioxus::launch(|| {
         rsx! {
         //tailwind css
@@ -34,64 +31,63 @@ fn main() {
 //Function for landing page ui, mainly ui in this one, so nothing to coment about
 #[component]
 fn Home() -> Element {
+    //for navigation - encasing the whole button messes up the alighment for some reason
+    let nav = use_navigator();
 
-//for navigation - encasing the whole button messes up the alighment for some reason
-let nav = use_navigator();
-
-rsx! {
+    rsx! {
         div {
 
             class: "hero min-h-screen bg-base-200",
-            
+
             div {
                 class: "hero-content text-center",
-                
+
                 div {
                     class: "max-w-3xl",
-                    
 
-                    h1 { 
-                        class: "text-5xl font-bold text-primary mb-6", 
-                        "Generátor detekčních kódů" 
+
+                    h1 {
+                        class: "text-5xl font-bold text-primary mb-6",
+                        "Generátor detekčních kódů"
                     }
-                    
+
 
                     p {
                         class: "text-lg text-base-content/80 mb-8",
                         "Interaktivní nástroj pro analýzu nejběžnějších identifikačních kódů z každodenního života. "
                         "Aplikace demonstruje praktické využití modulo aritmetiky k zabezpečení dat proti chybám při jejich přenosu či ručním přepisu."
                     }
-                    
+
 
                     div {
                         class: "divider text-base-content/60 font-semibold mb-8",
                         "Vyberte kód pro analýzu"
                     }
-                    
+
                     div {
                         class: "grid grid-cols-1 md:grid-cols-2 gap-4",
-                        
-                        button { 
+
+                        button {
                             class: "btn btn-outline btn-primary btn-lg",
-                            onclick: move |_| {nav.push(Route::Rodne_cislo {});}, 
-                            "Rodné číslo (RČ)" 
+                            onclick: move |_| {nav.push(Route::Rodne_cislo {});},
+                            "Rodné číslo (RČ)"
                         }
-                        button { 
+                        button {
                             class: "btn btn-outline btn-secondary btn-lg",
-                            onclick: move |_| {nav.push(Route::Isbn {});}, 
-                            "ISBN-13" 
+                            onclick: move |_| {nav.push(Route::Isbn {});},
+                            "ISBN-13"
                         }
-                        button { 
-                            class: "btn btn-outline btn-accent btn-lg", 
-                            "EAN-13" 
+                        button {
+                            class: "btn btn-outline btn-accent btn-lg",
+                            "EAN-13"
                         }
-                        
-                        button { 
-                            class: "btn btn-outline btn-info btn-lg", 
+
+                        button {
+                            class: "btn btn-outline btn-info btn-lg",
                             //route here
                             onclick: move |_| {nav.push(Route::Rodne_cislo {});},
-                            "IBAN" 
-							
+                            "IBAN"
+
                         }
                     }
                 }
@@ -105,71 +101,91 @@ fn Isbn() -> Element {
     "This is the ISBN page."}
 }
 
-
-
 fn Rodne_cislo() -> Element {
-
-
-	//for navigation - encasing the whole button messes up the alighment for some reason
-	let nav = use_navigator();
+    //for navigation - encasing the whole button messes up the alighment for some reason
+    let nav = use_navigator();
     // Stav pro výběr kódu a zadaný vstup
     let mut input_value = use_signal(|| String::new());
-	//placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
-	let mut calculated_control_digit = use_signal(||" ‌‌‌".to_string());
+    //placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
+    let mut calculated_control_digit = use_signal(|| " ‌‌‌".to_string());
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
-            
+
             // Horní navigace / Zpět
-            button { 
+            button {
                 class: "btn btn-ghost gap-2",
                 onclick: move |_| {nav.push(Route::Home {});},
-                "Zpět na výběr" 
+                "Zpět na výběr"
             }
 
             // HLAVNÍ KARTA S FORMULÁŘEM
             div { class: "card bg-base-100 shadow-xl border border-base-300",
                 div { class: "card-body",
-                    h2 { class: "card-title text-2xl mb-4", 
-								"Analýza rodného čísla"
+                    h2 { class: "card-title text-2xl mb-4",
+                                "Analýza rodného čísla"
                     }
 
                     div { class: "form-control w-full",
                         label { class: "label",
                             span { class: "label-text font-semibold", "Vložte datový základ (bez kontrolní číslice)" }
                         }
-                        input { 
+                        input {
                             r#type: "text",
                             placeholder: "Např: 980215423",
                             class: "input input-bordered input-primary input-lg w-full font-mono",
                             value: "{input_value}",
-                            oninput: move |evt| 
-                            		{
-                            		input_value.set(evt.value());
-									//trigger when rodné číslo is the corrent len
-                            		if input_value.len() == 9 {
-                            			// 												input value is type Signal<String> -> .read() unwraps it somehow and .as_str() converts to &str
-                            			let result: Option<i32> = algorithms::rc_control_digit(input_value.read().as_str());
-                            			match result{
-                            				//Actually now that I think about it, even though my function returns i32
-                            				//representing the calculated value as String seems like a better idea
-                            				Some(val) => {let calculated_control_digit_int: i32 = val;
-                            							  calculated_control_digit.set(calculated_control_digit_int.to_string());
-                            							  },
-                            						//Have to use set here, because it is a signal
-                            				None => {calculated_control_digit.set("Neplatné RČ.".to_string());},
-                            				}
-                            			}
-                            		//Zde kontrola, zda je kontrolní číslice platná, pokud zadá uživatel všech 10 čísel
-                            		
-                            		else{
-                            			//placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
-                            			calculated_control_digit.set(" ‌‌‌".to_string());
-                            		}
+                            oninput: move |evt|
+                                    {
+                                    input_value.set(evt.value());
+                                    //trigger when rodné číslo is the corrent len
+                                    match input_value.len()
+                                    {
+                                    9 =>
+                                        {
+                                        // 												input value is type Signal<String> -> .read() unwraps it somehow and .as_str() converts to &str
+                                            let result: Option<i32> = algorithms::rc_control_digit(input_value.read().as_str());
+                                            match result{
+                                                //Actually now that I think about it, even though my function returns i32
+                                                //representing the calculated value as String seems like a better idea
+                                                Some(val) => {let calculated_control_digit_int: i32 = val;
+                                                              calculated_control_digit.set(calculated_control_digit_int.to_string());
+                                                              },
+                                                        //Have to use set here, because it is a signal
+                                                None => {calculated_control_digit.set("Neplatné RČ.".to_string());},
+                                                }
+                                            }
+                                    //Pokud uživatel zadá celé RČ - provést kontrolu číslice
+                                    10 =>
+                                    {
+                                            let result: Option<i32> = algorithms::rc_control_digit(input_value.read().as_str());
+											match result{
+												//Actually now that I think about it, even though my function returns i32
+												//representing the calculated value as String seems like a better idea
+												Some(val) => 
+												{	
+													let calculated_control_digit_int: i32 = val;
+													calculated_control_digit.set(calculated_control_digit_int.to_string());
+													//Check whether the calculated control number is different to that the user inputted
+													if !input_value.read().ends_with(&calculated_control_digit_int.to_string()){
+														calculated_control_digit.set("Neplatný kontrolní digit RČ".to_string());
+													}
+													},
+												//Have to use set here, because it is a signal
+												None => {calculated_control_digit.set("Neplatné RČ.".to_string());},
+											}
+											
+                                    }
+
+                                    _ => {
+                                            //placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
+                                            calculated_control_digit.set(" ‌‌‌".to_string());
+                                        }
+                                    }
                             }
                         }
                         label { class: "label",
-                            span { class: "label-text-alt text-base-content/60", 
-                                "Systém automaticky dopočítá zbytek pomocí modulo aritmetiky." 
+                            span { class: "label-text-alt text-base-content/60",
+                                "Systém automaticky dopočítá zbytek pomocí modulo aritmetiky."
                             }
                         }
                     }
@@ -178,7 +194,7 @@ fn Rodne_cislo() -> Element {
 
             // STŘEDNÍ ČÁST: VÝSLEDKY A STATISTIKY
             div { class: "grid grid-cols-1 md:grid-cols-3 gap-6",
-                
+
                 // Panel pro výsledek
                 div { class: "stats shadow bg-primary text-primary-content col-span-1",
                     div { class: "stat",
@@ -202,7 +218,7 @@ fn Rodne_cislo() -> Element {
 
             // SPODNÍ ČÁST: POSTUP A VIZUALIZACE
             div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
-                
+
                 // Matematický postup
                 div { class: "space-y-4",
                     h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
