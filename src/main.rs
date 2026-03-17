@@ -1,4 +1,6 @@
 use dioxus::prelude::*;
+//for algos
+mod algorithms;
 
 
 //used for transfering between code types
