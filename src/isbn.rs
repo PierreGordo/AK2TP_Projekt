@@ -25,29 +25,48 @@ pub fn Isbn() -> Element {
     let nav = use_navigator();
     
     // Zadaný vstup od uživatele
-    let mut input_value = use_signal(|| String::new());
+    let mut input_value = use_signal(|| String::new());	
+	//Pole do kterých budu vkládat data
+    let mut isbn_prefix = String::new();
+    let mut isbn_group = String::new();
+    let mut isbn_publisher = String::new();
+    let mut isbn_publication = String::new();
+    let mut isbn_check_digit = String::new();
 
-	// Used for storing the data since modyfing the Signal type input_value does weird stuff
-    let mut input_string = String::new();
-    
-    // Zástupné signály pro vizualizaci rozpárování ISBN kódu
-    // Zde později napojíš svou logiku pro rozdělení vstupního řetězce
-    let mut isbn_prefix = use_signal(|| "".to_string());
-    let mut isbn_group = use_signal(|| "".to_string());
-    let mut isbn_publisher = use_signal(|| "".to_string());
-    let mut isbn_publication = use_signal(|| "".to_string());
-    let mut isbn_check_digit = use_signal(|| "".to_string());
-
-
-    // Signály pro experimentální HTTP data
-    let mut api_book_title = use_signal(|| String::new());
-    let mut api_book_author = use_signal(|| String::new());
-    let mut api_book_year = use_signal(|| String::new());
 
 	//signály pro error uživatele při vkládání ISBN
-    let mut has_error = use_signal(|| false);
+    let mut has_error = false;
     //pro text erroru
-    let mut error_text = use_signal(|| String::new());
+    let mut error_text = String::new();
+
+	// ================ LOGIKA ZAZNAMENÁVÁNÍ DAT DO POLÍ ======================
+
+
+	//check jestli je v poli něco
+	if !input_value.is_empty(){
+		//Chheck whether input string is parsable to i32 - e.g whether 
+		// String vstupu od uživatele pro držení hodnoty
+		let input_string = input_value();
+		//pokus o split stringu -> musí tam být pomlky, jinak bych nevěděl co dát do jakého pole
+		let mut fields_vec: Vec<&str> = input_string.split('-').collect();
+		//remove all "" characters, occur when input is 1- the vec is ["", "1"]
+		fields_vec.retain(|&elem| !elem.is_empty());
+
+		//check polí - kolik jich tam je - zkoušel jsem tu match, ale vzhledem k tomu, že potřebuju porovnávat len s několika čísly tak
+		// if se jeví jako lepší možnost
+		if fields_vec.len() >= 1{		
+				//this triggers if the value cant be parsed to i32 - meaning its not numeric
+				if fields_vec[0].parse::<i32>().is_err(){
+					has_error = true;
+					error_text = "V prefixu ISBN se vyskytuje nečíselný charakter.".to_string();
+				}
+				else{
+					//když není error, zapsat hodnotu
+					isbn_prefix = fields_vec[0].to_string();
+				}
+		
+			}
+    }
 
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
@@ -77,117 +96,18 @@ pub fn Isbn() -> Element {
                             r#type: "text",
                             placeholder: "Např: 978802000987",
                             //Přepínání vzhledu input fieldu pokud je error
-                            class: {if has_error() 
+                            class: {if has_error 
                             {"input input-bordered input-error text-error input-lg w-full font-mono"} 
                             else 
                             {"input input-bordered input-primary input-lg w-full font-mono"}},
                             maxlength: "15", // 17 to account for the - symbols, but formatted cant be more than 12/13 (without the control digit 12, with its 13)
                             //value: "{input_value}",
                             oninput: move |evt| {
-                            	//wipe all errors
-                            	has_error.set(false);
-                            	error_text.set("".to_string());
-
-                                //This evt.value func returns a string
-                                input_value.set(evt.value());
-								//isbn_prefix.set(evt.value());
-
-								//try to trim out the - symbols between the numbers
-								//does this copy or take ownership?
-								input_string = evt.value();
-								//this splits the number by -
-								let binding = input_string.clone();
-								let numbers_vec: Vec<&str> = binding.split('-').collect();
-								//Set the input string to be without the -
-								input_string = numbers_vec.join("");
-								
-								
-								//reset znaků - ano je to hloupé gg
-								isbn_prefix.set(" ‌‌‌".to_string());
-								isbn_group.set(" ‌‌‌".to_string());
-								isbn_publisher.set(" ‌‌‌".to_string());
-								isbn_publication.set(" ‌‌‌".to_string());
-								
-								//Check jestli je zadaná hodnota numerická
-								if input_string.trim().parse::<i64>().is_err() && input_value.len() != 0 {
-									tracing::info!("GG není numerická, je tam něco jiného jak čísla a -");
-								}
-								else {
-									//tato část je zvláštní, ale nenapadlo mě jak to jinak vyřešit a zabránit crashi
-									//než tu naspamovat ty if statementy
-									//nastavení prefixu
-									if !numbers_vec.is_empty() {
-										isbn_prefix.set(String::from(numbers_vec[0]));
-										//error handle
-										if isbn_prefix.len() > 3{
-											//nemůže být více jak 3
-											has_error.set(true);
-											error_text.set("První pole (předčíslí) musí mít přesně 3 čísla".to_string());
-										}
-									}
-									//nastavení skupiny
-									if numbers_vec.len() >= 2{
-										isbn_group.set(String::from(numbers_vec[1]));
-										//error handle
-										if isbn_group.len() > 5{
-											//nemůže být více jak 3
-											has_error.set(true);
-											error_text.set("Druhé pole (jazyková oblast/země) nemůže mít více jak 5 čísel.".to_string());
-										}
-										//error handle for previous group - protože v tom první to nemůže být jinak by to varovalo hned zestartu
-										if isbn_prefix.len() != 3{
-											has_error.set(true);
-											error_text.set("První pole (předčíslí) musí mít přesně 3 čísla".to_string());
-										}
-									}
-									//nastavení vydavatele
-									if numbers_vec.len() >= 3{
-										isbn_publisher.set(String::from(numbers_vec[2]));
-
-										if isbn_publisher.len() > 7{
-											has_error.set(true);
-											error_text.set("Třetí pole (vydavatel) nemůže mít více jak 7 čísel.".to_string());
-										}
-										//error handle for skupina
-										if isbn_group.len() < 1{
-											//nemůže být více jak 3
-											has_error.set(true);
-											error_text.set("Druhé pole (jazyková oblast/země) musí více jak 0 čísel.".to_string());
-										}
-									}
-									//nastavení publikace a výpočet kontrolní číslice (pokud je full délka)
-									if numbers_vec.len() >= 4{
-										isbn_publication.set(String::from(numbers_vec[3]));
-										//pokud má string správnou délku a žádný element numbers_vec není prázdné místo
-										if input_string.len() == 12 && !numbers_vec.contains(&""){
-											isbn_check_digit.set(calculate_control_digit(&input_string));
-										}
-										if isbn_group.len() > 6{
-											//nemůže být více jak 3
-											has_error.set(true);
-											error_text.set("Čtvrté pole (publikace) nemůže mít více jak 6 čísel.".to_string());
-										}
-										//error handle for previous group - vydavatel
-										if isbn_publisher.len() < 1{
-											has_error.set(true);
-											error_text.set("Třetí pole (vydavatel) musí mít více jak 0 čísel.".to_string());
-										}
-										
-									}
-									if input_string.len() != 12{
-										isbn_check_digit.set("".to_string());
-									}
-									
-									
-								}
-								
-                                
-                                
-								
+                                input_value.set(evt.value());  
                             },
                         }
                         //popis případného erroru
-                        if has_error() {
+                        if has_error {
                             label { class: "label py-0",
                                 span { class: "label-text-alt text-error",
                                     "{error_text}"
