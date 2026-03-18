@@ -26,6 +26,9 @@ pub fn Isbn() -> Element {
     
     // Zadaný vstup od uživatele
     let mut input_value = use_signal(|| String::new());
+
+	// Used for storing the data since modyfing the Signal type input_value does weird stuff
+    let mut input_string = String::new();
     
     // Zástupné signály pro vizualizaci rozpárování ISBN kódu
     // Zde později napojíš svou logiku pro rozdělení vstupního řetězce
@@ -67,7 +70,7 @@ pub fn Isbn() -> Element {
                             r#type: "text",
                             placeholder: "Např: 978802000987",
                             class: "input input-bordered input-primary input-lg w-full font-mono",
-                            maxlength: "12", // 13 čísel
+                            maxlength: "15", // 17 to account for the - symbols, but formatted cant be more than 12/13 (without the control digit 12, with its 13)
                             //value: "{input_value}",
                             oninput: move |evt| {
 
@@ -75,30 +78,44 @@ pub fn Isbn() -> Element {
                                 input_value.set(evt.value());
 								//isbn_prefix.set(evt.value());
 
+								//try to trim out the - symbols between the numbers
+								//does this copy or take ownership?
+								input_string = evt.value();
+								//this splits the number by -
+								let binding = input_string.clone();
+								let numbers_vec: Vec<&str> = binding.split('-').collect();
+								//Set the input string to be without the -
+								input_string = numbers_vec.join("");
+								tracing::info!("{:?}", numbers_vec);
+								
+								
+								//filter -
+								tracing::info!("Formatted string is {input_string}");
+
 								//Check jestli je zadaná hodnota numerická
-								if evt.value().trim().parse::<i64>().is_err() && input_value.len() != 0 {
-									tracing::info!("GG není numerická");
+								if input_string.trim().parse::<i64>().is_err() && input_value.len() != 0 {
+									tracing::info!("GG není numerická, je tam něco jiného jak čísla a -");
 								}
 								else {
 									//tato část je zvláštní, ale nenapadlo mě jak to jinak vyřešit a zabránit crashi
 									//než tu naspamovat ty if statementy
 									//nastavení prefixu
-									if evt.value().len() >= 3{
-										isbn_prefix.set(String::from(&evt.value()[..3]));
+									if numbers_vec.len() >= 1{
+										isbn_prefix.set(String::from(numbers_vec[0]));
 									}
 									//nastavení skupiny
-									if evt.value().len() >= 5{
-										isbn_group.set(String::from(&evt.value()[3..5]));
+									if numbers_vec.len() >= 2{
+										isbn_group.set(String::from(numbers_vec[1]));
 									}
 									//nastavení vydavatele
-									if evt.value().len() >= 8{
-										isbn_publisher.set(String::from(&evt.value()[5..8]));
+									if numbers_vec.len() >= 3{
+										isbn_publisher.set(String::from(numbers_vec[2]));
 									}
 									//nastavení publikace a výpočet kontrolní číslice
-									if evt.value().len() >= 12{
-										isbn_publication.set(String::from(&evt.value()[8..12]));
+									if numbers_vec.len() >= 4{
+										isbn_publication.set(String::from(numbers_vec[3]));
 
-										isbn_check_digit.set(calculate_control_digit(&evt.value()));
+										isbn_check_digit.set(calculate_control_digit(&input_string));
 									}
 									
 									
@@ -111,7 +128,7 @@ pub fn Isbn() -> Element {
                         }
                         label { class: "label",
                             span { class: "label-text-alt text-base-content/60",
-                                "Zadávejte bez pomlček"
+                                "Zadávejte s pomlčkami"
                             }
                         }
                     }
