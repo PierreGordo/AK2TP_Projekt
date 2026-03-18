@@ -6,6 +6,8 @@ mod rodne_cislo;
 use rodne_cislo::Rodne_cislo;
 //for logging - remove later when app complete
 use tracing;
+mod isbn;
+use isbn::Isbn;
 
 #[derive(Clone, Debug, PartialEq, Routable)]
 pub enum Route {
@@ -92,6 +94,3 @@ fn Home() -> Element {
     }
 }
 
-fn Isbn() -> Element {
-    rsx! { "This is the ISBN page." }
-}
