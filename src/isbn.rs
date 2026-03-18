@@ -32,16 +32,22 @@ pub fn Isbn() -> Element {
     
     // Zástupné signály pro vizualizaci rozpárování ISBN kódu
     // Zde později napojíš svou logiku pro rozdělení vstupního řetězce
-    let mut isbn_prefix = use_signal(|| "978".to_string());
-    let mut isbn_group = use_signal(|| "80".to_string());
-    let mut isbn_publisher = use_signal(|| "200".to_string());
-    let mut isbn_publication = use_signal(|| "0987".to_string());
-    let mut isbn_check_digit = use_signal(|| "6".to_string());
+    let mut isbn_prefix = use_signal(|| "".to_string());
+    let mut isbn_group = use_signal(|| "".to_string());
+    let mut isbn_publisher = use_signal(|| "".to_string());
+    let mut isbn_publication = use_signal(|| "".to_string());
+    let mut isbn_check_digit = use_signal(|| "".to_string());
+
 
     // Signály pro experimentální HTTP data
     let mut api_book_title = use_signal(|| String::new());
     let mut api_book_author = use_signal(|| String::new());
     let mut api_book_year = use_signal(|| String::new());
+
+	//signály pro error uživatele při vkládání ISBN
+    let mut has_error = use_signal(|| false);
+    //pro text erroru
+    let mut error_text = use_signal(|| String::new());
 
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
@@ -66,13 +72,21 @@ pub fn Isbn() -> Element {
                                 "Vložte prvních 12 čísel kódu ISBN (ISBN-13)"
                             }
                         }
+                        //error handling v tomto inputu je velmi hloupý ale snad v
                         input {
                             r#type: "text",
                             placeholder: "Např: 978802000987",
-                            class: "input input-bordered input-primary input-lg w-full font-mono",
+                            //Přepínání vzhledu input fieldu pokud je error
+                            class: {if has_error() 
+                            {"input input-bordered input-error text-error input-lg w-full font-mono"} 
+                            else 
+                            {"input input-bordered input-primary input-lg w-full font-mono"}},
                             maxlength: "15", // 17 to account for the - symbols, but formatted cant be more than 12/13 (without the control digit 12, with its 13)
                             //value: "{input_value}",
                             oninput: move |evt| {
+                            	//wipe all errors
+                            	has_error.set(false);
+                            	error_text.set("".to_string());
 
                                 //This evt.value func returns a string
                                 input_value.set(evt.value());
@@ -86,12 +100,14 @@ pub fn Isbn() -> Element {
 								let numbers_vec: Vec<&str> = binding.split('-').collect();
 								//Set the input string to be without the -
 								input_string = numbers_vec.join("");
-								tracing::info!("{:?}", numbers_vec);
 								
 								
-								//filter -
-								tracing::info!("Formatted string is {input_string}");
-
+								//reset znaků - ano je to hloupé gg
+								isbn_prefix.set(" ‌‌‌".to_string());
+								isbn_group.set(" ‌‌‌".to_string());
+								isbn_publisher.set(" ‌‌‌".to_string());
+								isbn_publication.set(" ‌‌‌".to_string());
+								
 								//Check jestli je zadaná hodnota numerická
 								if input_string.trim().parse::<i64>().is_err() && input_value.len() != 0 {
 									tracing::info!("GG není numerická, je tam něco jiného jak čísla a -");
@@ -100,22 +116,66 @@ pub fn Isbn() -> Element {
 									//tato část je zvláštní, ale nenapadlo mě jak to jinak vyřešit a zabránit crashi
 									//než tu naspamovat ty if statementy
 									//nastavení prefixu
-									if numbers_vec.len() >= 1{
+									if !numbers_vec.is_empty() {
 										isbn_prefix.set(String::from(numbers_vec[0]));
+										//error handle
+										if isbn_prefix.len() > 3{
+											//nemůže být více jak 3
+											has_error.set(true);
+											error_text.set("První pole (předčíslí) musí mít přesně 3 čísla".to_string());
+										}
 									}
 									//nastavení skupiny
 									if numbers_vec.len() >= 2{
 										isbn_group.set(String::from(numbers_vec[1]));
+										//error handle
+										if isbn_group.len() > 5{
+											//nemůže být více jak 3
+											has_error.set(true);
+											error_text.set("Druhé pole (jazyková oblast/země) nemůže mít více jak 5 čísel.".to_string());
+										}
+										//error handle for previous group - protože v tom první to nemůže být jinak by to varovalo hned zestartu
+										if isbn_prefix.len() != 3{
+											has_error.set(true);
+											error_text.set("První pole (předčíslí) musí mít přesně 3 čísla".to_string());
+										}
 									}
 									//nastavení vydavatele
 									if numbers_vec.len() >= 3{
 										isbn_publisher.set(String::from(numbers_vec[2]));
+
+										if isbn_publisher.len() > 7{
+											has_error.set(true);
+											error_text.set("Třetí pole (vydavatel) nemůže mít více jak 7 čísel.".to_string());
+										}
+										//error handle for skupina
+										if isbn_group.len() < 1{
+											//nemůže být více jak 3
+											has_error.set(true);
+											error_text.set("Druhé pole (jazyková oblast/země) musí více jak 0 čísel.".to_string());
+										}
 									}
-									//nastavení publikace a výpočet kontrolní číslice
+									//nastavení publikace a výpočet kontrolní číslice (pokud je full délka)
 									if numbers_vec.len() >= 4{
 										isbn_publication.set(String::from(numbers_vec[3]));
-
-										isbn_check_digit.set(calculate_control_digit(&input_string));
+										//pokud má string správnou délku a žádný element numbers_vec není prázdné místo
+										if input_string.len() == 12 && !numbers_vec.contains(&""){
+											isbn_check_digit.set(calculate_control_digit(&input_string));
+										}
+										if isbn_group.len() > 6{
+											//nemůže být více jak 3
+											has_error.set(true);
+											error_text.set("Čtvrté pole (publikace) nemůže mít více jak 6 čísel.".to_string());
+										}
+										//error handle for previous group - vydavatel
+										if isbn_publisher.len() < 1{
+											has_error.set(true);
+											error_text.set("Třetí pole (vydavatel) musí mít více jak 0 čísel.".to_string());
+										}
+										
+									}
+									if input_string.len() != 12{
+										isbn_check_digit.set("".to_string());
 									}
 									
 									
@@ -126,6 +186,14 @@ pub fn Isbn() -> Element {
 								
                             },
                         }
+                        //popis případného erroru
+                        if has_error() {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-error",
+                                    "{error_text}"
+                                }
+                            }
+                        }
                         label { class: "label",
                             span { class: "label-text-alt text-base-content/60",
                                 "Zadávejte s pomlčkami"
@@ -133,14 +201,14 @@ pub fn Isbn() -> Element {
                         }
                     }
 
-                    // VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ ISBN
+					// VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ ISBN
                     div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
                         h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70", "Struktura načteného ISBN" }
                         div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
                             
-                            // Prefix (pouze u ISBN-13)
+                            // Prefix
                             div { class: "flex flex-col items-center w-20 md:w-24",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full py-2 rounded shadow-sm text-center", "{isbn_prefix}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_prefix}" }
                                 div { class: "text-xs mt-2 font-semibold", "Prefix" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "EAN produktový kód" }
                             }
@@ -149,7 +217,7 @@ pub fn Isbn() -> Element {
                             
                             // Registrační skupina
                             div { class: "flex flex-col items-center w-16 md:w-20",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full py-2 rounded shadow-sm text-center", "{isbn_group}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_group}" }
                                 div { class: "text-xs mt-2 font-semibold", "Skupina" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Země / Jazyk" }
                             }
@@ -158,7 +226,7 @@ pub fn Isbn() -> Element {
                             
                             // Vydavatel
                             div { class: "flex flex-col items-center w-20 md:w-24",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full py-2 rounded shadow-sm text-center", "{isbn_publisher}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publisher}" }
                                 div { class: "text-xs mt-2 font-semibold", "Vydavatel" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Identifikátor vydavatele" }
                             }
@@ -167,7 +235,7 @@ pub fn Isbn() -> Element {
                             
                             // Publikace
                             div { class: "flex flex-col items-center w-24 md:w-28",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full py-2 rounded shadow-sm text-center", "{isbn_publication}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publication}" }
                                 div { class: "text-xs mt-2 font-semibold", "Publikace" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Konkrétní kniha" }
                             }
@@ -176,7 +244,7 @@ pub fn Isbn() -> Element {
                             
                             // Kontrolní číslice
                             div { class: "flex flex-col items-center w-16 md:w-20",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full py-2 rounded shadow-sm text-center", "{isbn_check_digit}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_check_digit}" }
                                 div { class: "text-xs mt-2 font-semibold", "Kontrola" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
                             }
@@ -207,43 +275,6 @@ pub fn Isbn() -> Element {
                     }
                 }
 
-                // Experimentální funkce - HTTP Requesty (Získání informací o knize)
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold flex items-center gap-2", 
-                        "Experimentální API funkce"
-                        span { class: "badge badge-secondary badge-sm", "BETA" }
-                    }
-                    div { class: "card bg-base-200 shadow-sm border border-base-300",
-                        div { class: "card-body p-5",
-                            p { class: "text-sm text-base-content/70 mb-4", 
-                                "Zde bude možné po kliknutí poslat HTTP GET request (např. na Google Books API) pro zjištění metadat o knize podle zadaného ISBN." 
-                            }
-                            
-                            // Akční tlačítko pro request (Zatím bez logiky)
-                            button { 
-                                class: "btn btn-primary w-full mb-4",
-                                // Zde přidáš async onclick pro fetch dat
-                                "Vyhledat informace o knize v API"
-                            }
-
-                            // Formulář pro zobrazení výsledků z API
-                            div { class: "space-y-3",
-                                div { class: "form-control w-full",
-                                    label { class: "label py-1", span { class: "label-text text-xs", "Název knihy" } }
-                                    input { r#type: "text", class: "input input-bordered input-sm w-full", readonly: true, value: "{api_book_title}", placeholder: "Čeká na data..." }
-                                }
-                                div { class: "form-control w-full",
-                                    label { class: "label py-1", span { class: "label-text text-xs", "Autor" } }
-                                    input { r#type: "text", class: "input input-bordered input-sm w-full", readonly: true, value: "{api_book_author}", placeholder: "Čeká na data..." }
-                                }
-                                div { class: "form-control w-full",
-                                    label { class: "label py-1", span { class: "label-text text-xs", "Rok vydání" } }
-                                    input { r#type: "text", class: "input input-bordered input-sm w-full", readonly: true, value: "{api_book_year}", placeholder: "Čeká na data..." }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
     }
