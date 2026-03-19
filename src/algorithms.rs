@@ -2,14 +2,18 @@
 
 //rodne cislo kotrnolní číslice
 //Vstupem je zadané 9 (bez kontrolního čísla na konci) místné rodné číslo: ve stvaru String
-pub fn rc_control_digit(rodne_cislo: &str) -> Option<i32> {
+pub fn calculate_rc_control_digit(rodne_cislo: &str) -> Option<i32> {
     //Vzatí prvních 9 digitů (pokud uživatel zadá 10, tak chci rovnou provést kontrolu)
     // why does this work wtf? reference to reference to string? huh?
     //let rc_copy = &rodne_cislo[..9];
     //BUT HERE IT TAKES WITHOUT REFERENCE HUHUHUHUU? bro i suck at rust
     if let Ok(val) = rodne_cislo[..9].parse() {
         let rodc_int: i64 = val;
-        let modulo_rodc: i32 = (rodc_int % 11) as i32;
+        let mut modulo_rodc: i32 = (rodc_int % 11) as i32;
+        //pokud je modulo 10 tak vrátit 0
+        if modulo_rodc == 10{
+        	modulo_rodc == 0;
+        }
         return Some(modulo_rodc);
     }
 

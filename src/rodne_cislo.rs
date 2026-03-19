@@ -1,22 +1,129 @@
 use dioxus::prelude::*;
-use crate::algorithms;
 use crate::Route;
+//pro algoritmus výpočtu kontrolní číslice rodného čísla
+use crate::algorithms::calculate_rc_control_digit;
 
-
+#[component]
 pub fn Rodne_cislo() -> Element {
-    //for navigation - encasing the whole button messes up the alighment for some reason
     let nav = use_navigator();
-    // Stav pro výběr kódu a zadaný vstup
+
+    //Vstup do input field
     let mut input_value = use_signal(|| String::new());
-    //placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
-    let mut calculated_control_digit = use_signal(|| " ‌‌‌".to_string());
-	//na manipulování toho zda je viditelný infobox, či ne - buď "opacity-100 scale-100 visible" nebo "opacity-0 scale-95 invisible"
-	let mut visibility_state = use_signal(|| String::from("opacity-0 scale-95 invisible"));
-	//potřebuju znova kontrol digit, je to hloupé, ano -> udělam to? také ano, protoze to bude fungovat
-	let mut calculated_control_digit_second = use_signal(|| " ‌‌‌".to_string());
-	//potebuji znova input value, protože jinak to spolu fajtí a je to na houby - opět hloupá věc, ale co mám dělat :((
-	let mut input_value_valid_code = use_signal(|| String::new());
-    
+
+    //rok
+    let mut rc_rok = String::new();
+    let mut rc_mesic = String::new();
+    let mut rc_den = String::new();
+    let mut rc_koncovka = String::new();
+    let mut rc_control_digit = String::new();
+
+    //error handlign
+    let mut has_error = false;
+    let mut error_text = String::new();
+
+	//Check zda je vstupní pole prázdné
+    if !input_value.is_empty() {
+    	//Vstup ve stringu pro jednodušší manipulaci
+    	//Zavolání input_value() z toho vyplývá výsledek typ String
+    	let input_string = input_value();
+    	//je v řetězci dost znaků pro rok
+    	if input_string.len() >= 2{
+    		//experiment String.get() - non panicking slice
+    		match input_string.get(0..2){
+    									//String.get returns str i think
+    									//so i have to do to_string
+    			Some(val) => {
+				//check jestli se jedná o číslo
+				//check zda se nevyskytují nečíselné charaktery
+    			if val.parse::<i32>().is_err(){
+    				has_error = true;
+    				error_text = "V zadaném rodném čísle (políčko rok) se vyskytují nečíselné znaky.".to_string();
+    			}
+    			else{
+    				rc_rok = val.to_string();
+    			}
+    			
+
+    			},
+    			None => (),
+    		}
+    	} 
+
+    	//je v řetězci dost znaků pro měsíc
+    	if input_string.len() >= 4{
+    		//experiment String.get() - non panicking slice
+    		match input_string.get(2..4){
+    									//String.get returns str i think
+    									//so i have to do to_string
+    			Some(val) => {
+				//check jestli se jedná o číslo
+				//check zda se nevyskytují nečíselné charaktery
+    			if val.parse::<i32>().is_err(){
+    				has_error = true;
+    				error_text = "V zadaném rodném čísle (políčko měsíc) se vyskytují nečíselné znaky.".to_string();
+    			}
+    			else{
+    				rc_mesic = val.to_string();
+    			}
+    			
+
+    			},
+    			None => (),
+    		}
+    	} 
+    	//kontrola zda je dost pro den
+    	if input_string.len() >= 6{
+    		//experiment String.get() - non panicking slice
+    		match input_string.get(4..6){
+    									//String.get returns str i think
+    									//so i have to do to_string
+    			Some(val) => {
+				//check jestli se jedná o číslo
+				//check zda se nevyskytují nečíselné charaktery
+    			if val.parse::<i32>().is_err(){
+    				has_error = true;
+    				error_text = "V zadaném rodném čísle (políčko den) se vyskytují nečíselné znaky.".to_string();
+    			}
+    			else{
+    				rc_den = val.to_string();
+    			}
+    			
+
+    			},
+    			None => (),
+    		}
+    	} 
+    	//kontrola zda je dost pro koncovku
+    	if input_string.len() >= 9{
+    		//experiment String.get() - non panicking slice
+    		match input_string.get(6..9){
+    									//String.get returns str i think
+    									//so i have to do to_string
+    			Some(val) => {
+				//check jestli se jedná o číslo
+				//check zda se nevyskytují nečíselné charaktery
+    			if val.parse::<i32>().is_err(){
+    				has_error = true;
+    				error_text = "V zadaném rodném čísle (políčko den) se vyskytují nečíselné znaky.".to_string();
+    			}
+    			else{
+    				rc_koncovka = val.to_string();
+    				//nyní už máme dostatečně dlouhý řetězec a ve správném tvaru
+    				match calculate_rc_control_digit(&input_string){
+    					Some(rc_cd) => {rc_control_digit = rc_cd.to_string();},
+    					None => (),
+    				}
+    			}
+    			
+
+    			},
+    			None => (),
+    		}
+    	}
+
+    	
+    }
+
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
 
@@ -29,138 +136,87 @@ pub fn Rodne_cislo() -> Element {
                 "Zpět na výběr"
             }
 
-            // HLAVNÍ KARTA S FORMULÁŘEM
+            // HLAVNÍ KARTA S FORMULÁŘEM A VIZUALIZACÍ
             div { class: "card bg-base-100 shadow-xl border border-base-300",
                 div { class: "card-body",
-                    h2 { class: "card-title text-2xl mb-4", "Analýza rodného čísla" }
+                    h2 { class: "card-title text-2xl mb-4", "Analýza rodného čísla (RČ)" }
 
                     div { class: "form-control w-full",
                         label { class: "label",
                             span { class: "label-text font-semibold",
-                                "Vložte datový základ (buď bez kontrolní číslice, nebo s ní pro kontrolu rodného čísla)"
+                                "Vložte prvních 9 čísel rodného čísla bez lomítka."
                             }
                         }
                         input {
                             r#type: "text",
                             placeholder: "Např: 980215423",
-                            class: "input input-bordered input-primary input-lg w-full font-mono",
-                            //this could fix my problems
-                            maxlength: "10",
-                            value: "{input_value}",
-                            oninput: //trigger when rodné číslo is the corrent len
-                            //All comments got moved here by DIOXUS fmt - gg to readability and understanding of my own code
-                            //make the infobox warning go invisible, when user types in again, has to be at the top, because if at the bottom, it overrides the
-                            //command to make it visible
-                            // 												input value is type Signal<String> -> .read() unwraps it somehow and .as_str() converts to &str
-                            //Actually now that I think about it, even though my function returns i32
-                            //representing the calculated value as String seems like a better idea
-                            //Have to use set here, because it is a signal
-                            //Pokud uživatel zadá celé RČ - provést kontrolu číslice
-                            //this is made so that if you enter 10 digit RČ, it does not show up at the end
-                            //v kompletní valdiní kód políčku
-                            //Actually now that I think about it, even though my function returns i32
-                            //representing the calculated value as String seems like a better idea
-                            //Check whether the calculated control number is different to that the user inputted
-                            //This method was incredibly stupid so I am replacing it with a info box warning
-                            //calculated_control_digit.set("Neplatný kontrolní digit RČ".to_string());
-                            //also would be probably good here to set the Kompletní validní kód, to an acutaally valid code
-                            //that is too complex, i will just erase it
-                            //Have to use set here, because it is a signal
-
-                            //placeholder na vypočtený control digit - opět je to empty character aby to html drželo formu
-                            //Check jestli uživatel skutečně zadává čísla
-
-                            move |evt| {
-                                input_value.set(evt.value());
-                                visibility_state.set(String::from("opacity-0 scale-95 invisible"));
-                                input_value_valid_code.set(evt.value());
-                                match input_value.len() {
-                                    9 => {
-                                        let result: Option<i32> = algorithms::rc_control_digit(
-                                            input_value.read().as_str(),
-                                        );
-                                        match result {
-                                            Some(val) => {
-                                                let calculated_control_digit_int: i32 = val;
-                                                calculated_control_digit
-                                                    .set(calculated_control_digit_int.to_string());
-                                                calculated_control_digit_second
-                                                    .set(calculated_control_digit_int.to_string());
-                                            }
-                                            None => {
-                                                calculated_control_digit.set("Neplatné RČ.".to_string());
-                                            }
-                                        }
-                                    }
-                                    10 => {
-                                        calculated_control_digit_second.set(" ‌‌‌".to_string());
-                                        let result: Option<i32> = algorithms::rc_control_digit(
-                                            input_value.read().as_str(),
-                                        );
-                                        match result {
-                                            Some(val) => {
-                                                let calculated_control_digit_int: i32 = val;
-                                                calculated_control_digit
-                                                    .set(calculated_control_digit_int.to_string());
-                                                if !input_value
-                                                    .read()
-                                                    .ends_with(&calculated_control_digit_int.to_string())
-                                                {
-                                                    visibility_state
-                                                        .set(String::from("opacity-100 scale-100 visible"));
-                                                    input_value_valid_code.set(" ‌‌‌".to_string());
-                                                }
-                                            }
-                                            None => {
-                                                calculated_control_digit.set("Neplatné RČ.".to_string());
-                                            }
-                                        }
-                                    }
-                                    _ => {
-                                        calculated_control_digit.set(" ‌‌‌".to_string());
-                                        calculated_control_digit_second.set(" ‌‌‌".to_string());
-                                    }
-                                }
-                                if evt.value().trim().parse::<i64>().is_err() && input_value.len() != 0 {
-                                    calculated_control_digit.set("Neplatné RČ.".to_string());
-                                }
+                            // Zde by se logikou měnila třída na 'input-error' při špatném zadání
+                            class: {if has_error 
+                            {"input input-bordered input-error text-error input-lg w-full font-mono"} 
+                            else 
+                            {"input input-bordered input-primary input-lg w-full font-mono"}},
+                            maxlength: "9",
+                            oninput: move |evt| {
+                            	input_value.set(evt.value());
                             },
                         }
-                        label { class: "label",
-                            span { class: "label-text-alt text-base-content/60",
-                                "Systém automaticky dopočítá zbytek pomocí modulo aritmetiky."
+                        // error handling
+                        if has_error {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-error",
+                                    "{error_text}"
+                                }
+                            }
+                        }
+                    }
+
+                    // VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ RČ
+                    div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70", "Struktura načteného RČ" }
+                        div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
+                            
+                            // Rok
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_rok}" }
+                                div { class: "text-xs mt-2 font-semibold", "Rok" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Rok narození" }
+                            }
+                            
+                            // Měsíc
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_mesic}" }
+                                div { class: "text-xs mt-2 font-semibold", "Měsíc" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ženy mají +50" }
+                            }
+
+                            // Den
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_den}" }
+                                div { class: "text-xs mt-2 font-semibold", "Den" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Den narození" }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "/" }
+                            
+                            // Koncovka (Pořadové číslo)
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_koncovka}" }
+                                div { class: "text-xs mt-2 font-semibold", "Koncovka" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Pořadí v daný den" }
+                            }
+                            
+                            // Kontrolní číslice
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_control_digit}" }
+                                div { class: "text-xs mt-2 font-semibold", "Kontrola" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
                             }
                         }
                     }
                 }
             }
 
-            // STŘEDNÍ ČÁST: VÝSLEDKY A STATISTIKY
-            div { class: "grid grid-cols-1 md:grid-cols-3 gap-6",
-
-                // Panel pro výsledek
-                div { class: "stats shadow bg-primary text-primary-content col-span-1",
-                    div { class: "stat",
-                        div { class: "stat-title text-primary-content/80", "Kontrolní číslice" }
-                        div { class: "stat-value", "{calculated_control_digit}" } // ZDE JE OPET INVISIBLE CHARACTER, NEMAZAT -> pořád tam je ale přes proměnou
-                        div { class: "stat-desc text-primary-content/80",
-                            "Vypočteno metodou Modulo 10"
-                        }
-                    }
-                }
-
-                // Panel pro celkový kód
-                div { class: "stats shadow col-span-2",
-                    div { class: "stat",
-                        div { class: "stat-title", "Kompletní validní kód" }
-                        div { class: "stat-value tracking-widest",
-                            "{input_value_valid_code}{calculated_control_digit_second}"
-                        } // Je tady zero width chararcte rv tom aby to držel formu !!!! NEMAZAT CO JE ZA IMPUT VALUE !!!!
-                    }
-                }
-            }
-
-            // SPODNÍ ČÁST: POSTUP A VIZUALIZACE
+            // SPODNÍ ČÁST: POSTUP
             div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
 
                 // Matematický postup
@@ -168,46 +224,22 @@ pub fn Rodne_cislo() -> Element {
                     h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
                     div { class: "mockup-code bg-base-300 text-base-content",
                         pre { "data-prefix": ">",
-                            code { "Zbytek po vydělení rodného čísla 11." }
+                            code { "Celé 10místné číslo musí být dělitelné 11." }
                         }
                         pre { "data-prefix": ">",
-                            code { "V programování se pro tuto operaci používá" }
+                            code { "V programování používáme operátor % (modulo)." }
                         }
                         pre { "data-prefix": ">",
-                            code { "operátor % - modulo." }
+                            code { "Zbytek po vydělení prvních 9 číslic číslem 11" }
                         }
                         pre { "data-prefix": ">",
-                            code { "{input_value} % 11 = {calculated_control_digit}" }
+                            code { "se stává kontrolní číslicí." }
+                        }
+                        pre { "data-prefix": ">",
+                            code { "Výjimka: Pokud je zbytek 10, kontrolní číslice je 0." }
                         }
                     }
                 }
-
-                //Warning pokud se zadá neplatné 10 místné rodné číslo
-                div { class: "space-y-4",
-
-                    h3 { class: "text-xl font-bold", "Infobox" }
-                    div { class: "transition-all duration-300 ease-out {visibility_state}",
-                        //I have to wrap this infoallert in this div, to make it appearable and reapearrable
-                        div { role: "alert", class: "alert alert-warning",
-                            svg {
-                                xmlns: "http://www.w3.org/2000/svg",
-                                class: "h-6 w-6 shrink-0 stroke-current",
-                                fill: "none",
-                                view_box: "0 0 24 24",
-                                path {
-                                    stroke_linecap: "round",
-                                    stroke_linejoin: "round",
-                                    stroke_width: "2",
-                                    d: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
-                                }
-                            }
-                            span {
-                                "Varování: zadali jste rodné číslo s neplatnou kontrolní číslicí!"
-                            }
-                        }
-                    }
-                }
-            
             }
         }
     }
