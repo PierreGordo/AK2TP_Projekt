@@ -12,6 +12,9 @@ use isbn::Isbn;
 //for ean-13 UI and functionality
 mod ean13;
 use ean13::Ean13;
+//for IBAN UI and functionality
+mod iban;
+use iban::Iban;
 
 
 #[derive(Clone, Debug, PartialEq, Routable)]
@@ -27,6 +30,9 @@ pub enum Route {
 
     #[route("/ean-13")]
     Ean13,
+
+    #[route("/iban")]
+    Iban,
 }
 
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
@@ -94,7 +100,7 @@ fn Home() -> Element {
                             class: "btn btn-outline btn-info btn-lg",
                             //route here
                             onclick: move |_| {
-                                nav.push(Route::Rodne_cislo {});
+                                nav.push(Route::Iban {});
                             },
                             "IBAN"
                         
