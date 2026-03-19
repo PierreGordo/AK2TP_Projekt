@@ -2,16 +2,72 @@
 
 use dioxus::prelude::*;
 use crate::Route;
-
+//pro algoritmus výpočtu kontrolní číslice EAN-13
+use crate::algorithms::modulo_10_algorithm;
 
 #[component]
 pub fn Ean13() -> Element {
+
+	let nav = use_navigator();
+
+	let mut input_value = use_signal(|| String::new());
+
+	let mut ean13_gs_prefix = String::new();
+	let mut ean13_vyrobce = String::new();
+	let mut ean13_produkt = String::new();
+	let mut ean13_control_digit = String::new();
+
+	let mut has_error = false;
+	let mut error_text = String::new();
+
+	//check if its empty
+	if !input_value.is_empty(){
+
+		let input_string = input_value();
+
+		//check whether it is a number -> don't have to do it individually because they are not separated by a comma
+		//have to make it u64 though because its 13 digits
+		if input_string.parse::<u64>().is_err(){
+			has_error = true;
+			error_text = "V EAN-13 se vyskytují nečíselné znaky.".to_string();
+		}
+
+		if input_string.len() >= 3 && !has_error{
+			//attempt to parse
+			if let Some(val) = input_string.get(0..3){
+				ean13_gs_prefix = val.to_string();
+			}
+		}
+
+		if input_string.len() >= 7 && !has_error{
+			//attempt to parse
+			if let Some(val) = input_string.get(3..7){
+				ean13_vyrobce = val.to_string();
+			}
+		}
+		if input_string.len() >= 12 && !has_error{
+			//attempt to parse
+			if let Some(val) = input_string.get(7..12){
+				ean13_produkt = val.to_string();
+			}
+			//calculate control digit
+			//dont even have to check anything yahoo
+			ean13_control_digit = modulo_10_algorithm(&input_string);
+		}
+
+	}
+
+	
+
 	rsx! {
 	    div { class: "p-6 max-w-5xl mx-auto space-y-8",
 	
 	        // Horní navigace / Zpět
 	        button {
 	            class: "btn btn-ghost gap-2",
+	            onclick: move |_| {
+	            	nav.push(Route::Home {});
+	            },
 	            "Zpět na výběr"
 	        }
 	
@@ -23,22 +79,30 @@ pub fn Ean13() -> Element {
 	                div { class: "form-control w-full",
 	                    label { class: "label",
 	                        span { class: "label-text font-semibold",
-	                            "Vložte prvních 12 čísel kódu EAN-13. Vkládejte prosím s pomlčkami nebo mezerami."
+	                            "Vložte prvních 12 čísel kódu EAN-13."
 	                        }
 	                    }
 	                    input {
 	                        r#type: "text",
-	                        placeholder: "Např: 859-1234-56789",
+	                        placeholder: "Např: 859123456789",
 	                        // Zde by se logikou měnila třída na 'input-error', aktuálně je nastavena defaultní primární
-	                        class: "input input-bordered input-primary input-lg w-full font-mono",
-	                        maxlength: "17",
+                            class: {if has_error 
+                            {"input input-bordered input-error text-error input-lg w-full font-mono"} 
+                            else 
+                            {"input input-bordered input-primary input-lg w-full font-mono"}},
+                            oninput: move |evt| {
+                            	input_value.set(evt.value());
+                            },
+	                        maxlength: "12",
 	                    }
 	                    // Zástupný prvek pro chybovou hlášku
-	                    label { class: "label py-0 invisible", // Odstranit 'invisible' při zobrazení chyby
-	                        span { class: "label-text-alt text-error",
-	                            "Zástupný text pro error hlášku."
-	                        }
-	                    }
+                        if has_error {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-error",
+                                    "{error_text}"
+                                }
+                            }
+                        }
 	                }
 	
 	                // VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ EAN
@@ -48,7 +112,7 @@ pub fn Ean13() -> Element {
 	                        
 	                        // GS1 Prefix (Země/Typ)
 	                        div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
-	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "859" }
+	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ean13_gs_prefix}" }
 	                            div { class: "text-xs mt-2 font-semibold", "GS1 Prefix" }
 	                            div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Země (např. ČR)" }
 	                        }
@@ -57,7 +121,7 @@ pub fn Ean13() -> Element {
 	                        
 	                        // Číslo výrobce
 	                        div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[7rem]",
-	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "1234" }
+	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ean13_vyrobce}" }
 	                            div { class: "text-xs mt-2 font-semibold", "Výrobce" }
 	                            div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Registrační číslo firmy" }
 	                        }
@@ -66,7 +130,7 @@ pub fn Ean13() -> Element {
 	                        
 	                        // Číslo položky
 	                        div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[7rem]",
-	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "56789" }
+	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ean13_produkt}" }
 	                            div { class: "text-xs mt-2 font-semibold", "Produkt" }
 	                            div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Identifikace zboží" }
 	                        }
@@ -75,7 +139,7 @@ pub fn Ean13() -> Element {
 	                        
 	                        // Kontrolní číslice
 	                        div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "3" }
+	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ean13_control_digit}" }
 	                            div { class: "text-xs mt-2 font-semibold", "Kontrola" }
 	                            div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
 	                        }

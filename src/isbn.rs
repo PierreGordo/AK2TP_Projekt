@@ -11,14 +11,8 @@
 
 use dioxus::prelude::*;
 use crate::Route;
-
-//for debbuging
-use std::any::{type_name, type_name_of_val};
-//also for debbuging remove later 
-fn print_type_of<T>(_: &T){
-	tracing::info!("{}", type_name::<T>());
-}
-
+//import algoritmu na výpočet kontrolní číslice
+use crate::algorithms::modulo_10_algorithm;
 
 #[component]
 pub fn Isbn() -> Element {
@@ -134,7 +128,7 @@ pub fn Isbn() -> Element {
 				//check zda je string kompletní a může dojít k kalkulaci kontrolní číslice
 				if isbn_length == 12 {
 					let concat_isbn = isbn_prefix.clone() + &isbn_group + &isbn_publisher + &isbn_publication;
-					isbn_check_digit = calculate_control_digit(&concat_isbn);
+					isbn_check_digit = modulo_10_algorithm(&concat_isbn);
 					//tracing::info!(result);
 				}
 				else{
@@ -270,33 +264,4 @@ pub fn Isbn() -> Element {
             }
         }
     }
-}
-
-
-fn calculate_control_digit(isbn: &str) -> String{
-	//parse the string to numbers 
-	//zde už víme, že máme plné 12 místné isbn, bez kontrolní číslice a zároveň víme, že se skutečně jedná o číslo.
-	let mut sum: i32 = 0;
-	let mut multiply_by_3: bool = false;
-	
-	for s_num in isbn.chars(){
-		if multiply_by_3{
-			//zde je 10, protože se pohybujeme v desítkové sustavě
-			sum += (s_num.to_digit(10).unwrap() as i32) * 3;
-			multiply_by_3 = !multiply_by_3;
-		}
-		else{
-			sum += s_num.to_digit(10).unwrap() as i32;
-			multiply_by_3 = !multiply_by_3;
-		}
-	}
-
-	//zbytek po vydělení součtu 10 a odečtění tohoto čísla od čisla 10
-	let mut res = (10-(sum%10)).to_string();
-	if res == "10".to_string(){
-		res = "0".to_string();
-	}
-	res
-	//pokud je výsledek 10, tak se výsledkem stane nula
-	
 }
