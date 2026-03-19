@@ -6,8 +6,13 @@ mod rodne_cislo;
 use rodne_cislo::Rodne_cislo;
 //for logging - remove later when app complete
 use tracing;
+//for isbn UI and functionality
 mod isbn;
 use isbn::Isbn;
+//for ean-13 UI and functionality
+mod ean13;
+use ean13::Ean13;
+
 
 #[derive(Clone, Debug, PartialEq, Routable)]
 pub enum Route {
@@ -19,6 +24,9 @@ pub enum Route {
 
     #[route("/rodne_cislo")]
     Rodne_cislo,
+
+    #[route("/ean-13")]
+    Ean13,
 }
 
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
@@ -76,7 +84,11 @@ fn Home() -> Element {
                             },
                             "ISBN-13"
                         }
-                        button { class: "btn btn-outline btn-accent btn-lg", "EAN-13" }
+                        button { class: "btn btn-outline btn-accent btn-lg", 
+								onclick: move |_| {
+									nav.push(Route::Ean13 {});
+								},
+                        "EAN-13" }
 
                         button {
                             class: "btn btn-outline btn-info btn-lg",
