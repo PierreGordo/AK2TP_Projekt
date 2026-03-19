@@ -32,6 +32,8 @@ pub fn Isbn() -> Element {
     let mut isbn_publisher = String::new();
     let mut isbn_publication = String::new();
     let mut isbn_check_digit = String::new();
+    //hodnota která počítá délku isbn bez pomlček
+    let mut isbn_length: i32 = 0;
 
 
 	//signály pro error uživatele při vkládání ISBN
@@ -54,7 +56,7 @@ pub fn Isbn() -> Element {
 
 		//check polí - kolik jich tam je - zkoušel jsem tu match, ale vzhledem k tomu, že potřebuju porovnávat len s několika čísly tak
 		// if se jeví jako lepší možnost
-		if fields_vec.len() >= 1{		
+		if fields_vec.len() >= 1 {		
 				//this triggers if the value cant be parsed to i32 - meaning its not numeric
 				if fields_vec[0].parse::<i32>().is_err(){
 					has_error = true;
@@ -63,9 +65,84 @@ pub fn Isbn() -> Element {
 				else{
 					//když není error, zapsat hodnotu
 					isbn_prefix = fields_vec[0].to_string();
+					//Check zda není moc krátké, nebo dlouhé
+					if fields_vec[0].len() != 3 {
+						has_error = true;
+						error_text = "Prefix ISBN musí mít přesně 3 číslice.".to_string();	
+					}
+					else{
+						isbn_length += 3;
+					}
+					
 				}
 		
-			}
+		}
+		//není tu else if, protože potřebuji aby se vždy nastavily všechny hodnoty
+		if fields_vec.len() >= 2 {
+				if fields_vec[1].parse::<i32>().is_err(){
+					has_error = true;
+					error_text = "V ISBN skupině se vyskytuje nečíselný charakter.".to_string();
+				}
+				else{
+					//když není error, zapsat hodnotu
+					isbn_group = fields_vec[1].to_string();
+					//add len to len total
+					isbn_length += fields_vec[1].len() as i32;
+					//Check zda není moc krátké, nebo dlouhé
+					if fields_vec[1].len() > 5 {
+						has_error = true;
+						error_text = "ISBN skupina musí mít maximálně 5 číslic.".to_string();	
+					}
+					
+				}	
+		}
+		//není tu else if, protože potřebuji aby se vždy nastavily všechny hodnoty
+		if fields_vec.len() >= 3 {
+				if fields_vec[2].parse::<i32>().is_err(){
+					has_error = true;
+					error_text = "V ISBN vydavateli se vyskytuje nečíselný charakter.".to_string();
+				}
+				else{
+					//když není error, zapsat hodnotu
+					isbn_publisher = fields_vec[2].to_string();
+					//add len to total
+					isbn_length += fields_vec[2].len() as i32;
+					//Check zda není moc krátké, nebo dlouhé
+					if fields_vec[2].len() > 7 {
+						has_error = true;
+						error_text = "ISBN vydavatel musí mít maximálně 7 číslic.".to_string();	
+					}
+					
+				}	
+		}
+		if fields_vec.len() >= 4 {
+				if fields_vec[3].parse::<i32>().is_err(){
+					has_error = true;
+					error_text = "ISBN publikaci se vyskytuje nečíselný charakter.".to_string();
+				}
+				else{
+					//když není error, zapsat hodnotu
+					isbn_publication = fields_vec[3].to_string();
+					//add len to total
+					isbn_length	+= fields_vec[3].len() as i32;
+					//Check zda není moc krátké, nebo dlouhé
+					if fields_vec[3].len() > 6 {
+						has_error = true;
+						error_text = "ISBN publikace musí mít maximálně 6 číslic.".to_string();	
+					}
+
+				//check zda je string kompletní a může dojít k kalkulaci kontrolní číslice
+				if isbn_length == 12 {
+					let concat_isbn = isbn_prefix.clone() + &isbn_group + &isbn_publisher + &isbn_publication;
+					isbn_check_digit = calculate_control_digit(&concat_isbn);
+					//tracing::info!(result);
+				}
+				else{
+					has_error = true;
+					error_text = ("Číslo ISBN-13 bez kontrolní číslice musí mít přesně 12 čísel, máte zaznamenaných pouze: ".to_string() + &(isbn_length.to_string()));
+				}
+			}	
+		}
     }
 
     rsx! {
@@ -88,7 +165,7 @@ pub fn Isbn() -> Element {
                     div { class: "form-control w-full",
                         label { class: "label",
                             span { class: "label-text font-semibold",
-                                "Vložte prvních 12 čísel kódu ISBN (ISBN-13)"
+                                "Vložte prvních 12 čísel kódu ISBN (ISBN-13). Vkládejte prosím s pomlčkami."
                             }
                         }
                         //error handling v tomto inputu je velmi hloupý ale snad v
@@ -114,11 +191,6 @@ pub fn Isbn() -> Element {
                                 }
                             }
                         }
-                        label { class: "label",
-                            span { class: "label-text-alt text-base-content/60",
-                                "Zadávejte s pomlčkami"
-                            }
-                        }
                     }
 
 					// VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ ISBN
@@ -127,8 +199,8 @@ pub fn Isbn() -> Element {
                         div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
                             
                             // Prefix
-                            div { class: "flex flex-col items-center w-20 md:w-24",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_prefix}" }
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_prefix}" }
                                 div { class: "text-xs mt-2 font-semibold", "Prefix" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "EAN produktový kód" }
                             }
@@ -136,8 +208,8 @@ pub fn Isbn() -> Element {
                             div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
                             
                             // Registrační skupina
-                            div { class: "flex flex-col items-center w-16 md:w-20",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_group}" }
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_group}" }
                                 div { class: "text-xs mt-2 font-semibold", "Skupina" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Země / Jazyk" }
                             }
@@ -145,8 +217,8 @@ pub fn Isbn() -> Element {
                             div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
                             
                             // Vydavatel
-                            div { class: "flex flex-col items-center w-20 md:w-24",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publisher}" }
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publisher}" }
                                 div { class: "text-xs mt-2 font-semibold", "Vydavatel" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Identifikátor vydavatele" }
                             }
@@ -154,8 +226,8 @@ pub fn Isbn() -> Element {
                             div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
                             
                             // Publikace
-                            div { class: "flex flex-col items-center w-24 md:w-28",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publication}" }
+                            div { class: "flex flex-col items-center min-w-[6rem] md:min-w-[7rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publication}" }
                                 div { class: "text-xs mt-2 font-semibold", "Publikace" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Konkrétní kniha" }
                             }
@@ -163,8 +235,8 @@ pub fn Isbn() -> Element {
                             div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
                             
                             // Kontrolní číslice
-                            div { class: "flex flex-col items-center w-16 md:w-20",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_check_digit}" }
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_check_digit}" }
                                 div { class: "text-xs mt-2 font-semibold", "Kontrola" }
                                 div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
                             }
@@ -220,7 +292,11 @@ fn calculate_control_digit(isbn: &str) -> String{
 	}
 
 	//zbytek po vydělení součtu 10 a odečtění tohoto čísla od čisla 10
-	tracing::info!("Vypočteno {}", (10-(sum%10)).to_string());
-	(10-(sum%10)).to_string()
+	let mut res = (10-(sum%10)).to_string();
+	if res == "10".to_string(){
+		res = "0".to_string();
+	}
+	res
+	//pokud je výsledek 10, tak se výsledkem stane nula
 	
 }
