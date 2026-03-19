@@ -54,6 +54,7 @@ pub fn Iban() -> Element {
             }
         }
         //další 4 čísla jsou číslem banky
+        //HOAX, může to být 3-8 čísel a nemusí to bý ani čísla
         if input_string.len() >= 6 {
             if let Some(val) = input_string.get(2..6) {
                 //kontrola numericity
