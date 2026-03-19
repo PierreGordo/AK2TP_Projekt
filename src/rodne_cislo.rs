@@ -27,60 +27,49 @@ pub fn Rodne_cislo() -> Element {
     	//Zavolání input_value() z toho vyplývá výsledek typ String
     	let input_string = input_value();
     	//je v řetězci dost znaků pro rok
-    	if input_string.len() >= 2{
+    	if input_string.len() >= 2 && !has_error{
     		//experiment String.get() - non panicking slice
-    		match input_string.get(0..2){
+    		if let Some(val) = input_string.get(0..2){
     									//String.get returns str i think
     									//so i have to do to_string
-    			Some(val) => {
 				//check jestli se jedná o číslo
 				//check zda se nevyskytují nečíselné charaktery
-    			if val.parse::<i32>().is_err(){
+    			if val.parse::<u32>().is_err(){
     				has_error = true;
     				error_text = "V zadaném rodném čísle (políčko rok) se vyskytují nečíselné znaky.".to_string();
     			}
     			else{
     				rc_rok = val.to_string();
     			}
-    			
-
-    			},
-    			None => (),
     		}
     	} 
 
     	//je v řetězci dost znaků pro měsíc
-    	if input_string.len() >= 4{
+    	if input_string.len() >= 4 && !has_error{
     		//experiment String.get() - non panicking slice
-    		match input_string.get(2..4){
+    		if let Some(val) = input_string.get(2..4){
     									//String.get returns str i think
     									//so i have to do to_string
-    			Some(val) => {
 				//check jestli se jedná o číslo
 				//check zda se nevyskytují nečíselné charaktery
-    			if val.parse::<i32>().is_err(){
+    			if val.parse::<u32>().is_err(){
     				has_error = true;
     				error_text = "V zadaném rodném čísle (políčko měsíc) se vyskytují nečíselné znaky.".to_string();
     			}
     			else{
     				rc_mesic = val.to_string();
     			}
-    			
-
-    			},
-    			None => (),
     		}
     	} 
     	//kontrola zda je dost pro den
-    	if input_string.len() >= 6{
+    	if input_string.len() >= 6 && !has_error{
     		//experiment String.get() - non panicking slice
-    		match input_string.get(4..6){
+    		if let Some(val) = input_string.get(4..6){
     									//String.get returns str i think
     									//so i have to do to_string
-    			Some(val) => {
 				//check jestli se jedná o číslo
 				//check zda se nevyskytují nečíselné charaktery
-    			if val.parse::<i32>().is_err(){
+    			if val.parse::<u32>().is_err(){
     				has_error = true;
     				error_text = "V zadaném rodném čísle (políčko den) se vyskytují nečíselné znaky.".to_string();
     			}
@@ -88,36 +77,27 @@ pub fn Rodne_cislo() -> Element {
     				rc_den = val.to_string();
     			}
     			
-
-    			},
-    			None => (),
     		}
     	} 
     	//kontrola zda je dost pro koncovku
-    	if input_string.len() >= 9{
+    	if input_string.len() >= 9 && !has_error{
     		//experiment String.get() - non panicking slice
-    		match input_string.get(6..9){
+    		if let Some(val) = input_string.get(6..9){
     									//String.get returns str i think
     									//so i have to do to_string
-    			Some(val) => {
 				//check jestli se jedná o číslo
 				//check zda se nevyskytují nečíselné charaktery
-    			if val.parse::<i32>().is_err(){
+    			if val.parse::<u32>().is_err(){
     				has_error = true;
     				error_text = "V zadaném rodném čísle (políčko den) se vyskytují nečíselné znaky.".to_string();
     			}
     			else{
-    				rc_koncovka = val.to_string();
-    				//nyní už máme dostatečně dlouhý řetězec a ve správném tvaru
-    				match calculate_rc_control_digit(&input_string){
-    					Some(rc_cd) => {rc_control_digit = rc_cd.to_string();},
-    					None => (),
+    					rc_koncovka = val.to_string();
+    					//nyní už máme dostatečně dlouhý řetězec a ve správném tvaru
+    					if let Some(rc_cd) = calculate_rc_control_digit(&input_string){
+    						rc_control_digit = rc_cd.to_string();
     				}
     			}
-    			
-
-    			},
-    			None => (),
     		}
     	}
 
@@ -236,7 +216,10 @@ pub fn Rodne_cislo() -> Element {
                             code { "se stává kontrolní číslicí." }
                         }
                         pre { "data-prefix": ">",
-                            code { "Výjimka: Pokud je zbytek 10, kontrolní číslice je 0." }
+                            code { "Výjimka: Pokud je zbytek 10," }
+                        }
+                        pre { "data-prefix": ">",
+                            code { "kontrolní číslice je 0." }
                         }
                     }
                 }
