@@ -3,20 +3,6 @@ use dioxus::prelude::*;
 //knihovna na IBAN, protože je to poměrně složité
 use iban::{Bban, Iban};
 
-//zřejmně nejjednodušší způsob konotroly kódu země - gigantický seznam -> jsou zde pouze země, které užívájí IBAN
-pub const IBAN_COUNTRY_CODES: &[&str] = &[
-    "AD", "AE", "AL", "AT", "AZ", "BA", "BE", "BG", "BH", "BI", "BR", "BY", "CH", "CR", "CY", "CZ",
-    "DE", "DJ", "DK", "DO", "EE", "EG", "ES", "FI", "FO", "FR", "GB", "GE", "GI", "GL", "GR", "GT",
-    "HR", "HU", "IE", "IL", "IQ", "IS", "IT", "JO", "KW", "KZ", "LB", "LC", "LI", "LT", "LU", "LV",
-    "LY", "MC", "MD", "ME", "MG", "MK", "ML", "MN", "MR", "MT", "MU", "MZ", "NE", "NI", "NL", "NO",
-    "OM", "PK", "PL", "PS", "PT", "QA", "RO", "RS", "RW", "SA", "SC", "SD", "SE", "SI", "SK", "SM",
-    "SN", "SO", "ST", "SV", "SY", "TG", "TL", "TN", "TR", "UA", "VA", "VG", "XK",
-];
-
-//funkce na vyhledávání v seznamu pomocí binary search
-pub fn is_valid_iban_country(code: &str) -> bool {
-    IBAN_COUNTRY_CODES.binary_search(&code).is_ok()
-}
 
 #[component]
 pub fn Iban_page() -> Element {
@@ -65,26 +51,15 @@ pub fn Iban_page() -> Element {
 
         let bban: Bban = val.bban();
 
-        //try to parse branch
-        match bban.branch_identifier() {
-            Some(bban_branch) => {
-                iban_bank_code = bban_branch.to_string();
-            }
-            None => {
-                iban_bank_code = "-".to_string();
-            }
-        }
         //try to parse bank account number
-        match bban.bank_identifier() {
-            Some(bban_acc) => {
-                iban_account_number = bban_acc.to_string();
-            }
-            None => (),
+        if let Some(bban_bank) = bban.bank_identifier(){
+        	iban_bank_code = bban_bank.to_string();
         }
         //pokud se nepodařilo parsenout bank account number, hodím do čísla účtu celý bban
-        if iban_bank_code.is_empty() {
-            iban_account_number = bban.as_str().to_string();
-        }
+		//teď mám, nebo nemám kód banky (ale spíš jo), takže slicenu celkový bban
+		let iban_bank_len: usize = iban_bank_code.len().try_into().unwrap();
+		iban_account_number = bban.as_str()[iban_bank_len..].to_string();
+
     }
     //pokud se nepodaří parsenout iban
     else {
@@ -119,26 +94,16 @@ pub fn Iban_page() -> Element {
 
                 let bban: Bban = val.bban();
 
-                //try to parse branch
-                match bban.branch_identifier() {
-                    Some(bban_branch) => {
-                        iban_bank_code = bban_branch.to_string();
-                    }
-                    None => {
-                        iban_bank_code = "-".to_string();
-                    }
-                }
-                //try to parse bank account number
-                match bban.bank_identifier() {
-                    Some(bban_acc) => {
-                        iban_account_number = bban_acc.to_string();
-                    }
-                    None => (),
-                }
-                //pokud se nepodařilo parsenout bank account number, hodím do čísla účtu celý bban
-                if iban_bank_code.is_empty() {
-                    iban_account_number = bban.as_str().to_string();
-                }
+		        let bban: Bban = val.bban();
+
+		        //try to parse bank account number
+		        if let Some(bban_bank) = bban.bank_identifier(){
+		        	iban_bank_code = bban_bank.to_string();
+		        }
+		        //pokud se nepodařilo parsenout bank account number, hodím do čísla účtu celý bban
+				//teď mám, nebo nemám kód banky (ale spíš jo), takže slicenu celkový bban
+				let iban_bank_len: usize = iban_bank_code.len().try_into().unwrap();
+				iban_account_number = bban.as_str()[iban_bank_len..].to_string();
             }
             else{
             	has_error = true;
@@ -167,12 +132,12 @@ pub fn Iban_page() -> Element {
                     div { class: "form-control w-full",
                         label { class: "label",
                             span { class: "label-text font-semibold",
-                                "Vložte kód IBAN k analýze (můžete i s mezerami). Vložte bez dvou čísel za znakem země, jedná se o kontrolní číslo."
+                                "Vložte kód IBAN k analýze (můžete i s mezerami)."
                             }
                         }
                         input {
                             r#type: "text",
-                            placeholder: "Např: CZ(zde je kontrolní dvoučíslí) 0100 0000 0012 3456 7890",
+                            placeholder: "Např: CZ69 0710 1781 2400 0000 4159",
                             // Přepínání tříd při chybě
                             class: {if has_error
                             {"input input-bordered input-error text-error input-lg w-full font-mono"}
@@ -252,24 +217,30 @@ pub fn Iban_page() -> Element {
             // SPODNÍ ČÁST: POSTUP
             div { class: "grid grid-cols-1 gap-8", // Pro IBAN dává smysl nechat na celou šířku, text je delší
 
-                // Matematický postup
+				// Matematický postup
                 div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
+                    h3 { class: "text-xl font-bold", "Výpočet kontrolní číslice IBAN" }
                     div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
                         pre { "data-prefix": ">",
-                            code { "Validace IBAN probíhá pomocí algoritmu Modulo 97." }
+                            code { "1. Sestaví se základní řetězec: Kód banky + Číslo účtu (tzv. BBAN)." }
                         }
                         pre { "data-prefix": ">",
-                            code { "1. Přesuňte první 4 znaky (země + kontrolní číslice) na konec." }
+                            code { "2. Na konec tohoto řetězce se připojí kód země a dvě nuly (např. 'CZ00')." }
                         }
                         pre { "data-prefix": ">",
-                            code { "2. Převeďte písmena na čísla (A=10, B=11 ... Z=35)." }
+                            code { "3. Všechna písmena v řetězci se převedou na čísla (A=10, B=11 ... Z=35)." }
                         }
                         pre { "data-prefix": ">",
-                            code { "3. Vznikne obrovské číslo (často přes 20 cifer)." }
+                            code { "4. Vzniklé číslo se vydělí 97 a zjistí se zbytek (operace modulo)." }
                         }
                         pre { "data-prefix": ">",
-                            code { "4. Zbytek po dělení tohoto čísla číslem 97 musí být přesně 1." }
+                            code { "5. Tento zbytek se následně odečte od čísla 98 (Výpočet: 98 - zbytek)." }
+                        }
+                        pre { "data-prefix": ">",
+                            code { "6. Pokud je výsledek jednociferný, přidá se před něj nula (např. 7 -> 07)." }
+                        }
+                        pre { "data-prefix": ">",
+                            code { "7. Toto dvojčíslí se pak vloží hned za kód země a tím vznikne finální IBAN." }
                         }
                     }
                 }
