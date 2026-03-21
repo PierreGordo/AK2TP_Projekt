@@ -1,7 +1,7 @@
 use crate::Route;
 use dioxus::prelude::*;
 //knihovna na IBAN, protože je to poměrně složité
-use iban::{Bban, Iban};
+use iban::Iban;
 
 //zřejmně nejjednodušší způsob konotroly kódu země - gigantický seznam -> jsou zde pouze země, které užívájí IBAN
 pub const IBAN_COUNTRY_CODES: &[&str] = &[
@@ -37,112 +37,91 @@ pub fn Iban_page() -> Element {
     // Error handling
     let mut has_error = false;
     let mut error_text = String::new();
-    //pro uspech
-    let mut has_sucess = false;
-    let mut sucess_text = String::new();
-    //pro informace
-    let mut has_info = false;
-    let mut info_text = String::new();
 
     if !input_value.is_empty() {
+        //bind input value to input string
         input_string = input_value();
-    }
-
-    //Zcela nová a radikálně jednodušší logika oproti starší verzi
-    //Pokaždé, když se zadá další číslice iban, pokusim se to parsenout jako iban
-    //pokud to selže, pokusím se tam dopočítat kontrolni číslici a opět to parsenout
-    //jako iban, pokud selže i to, nejedná se o validní iban
-
-    if let Ok(val) = input_string.parse::<Iban>() {
-        //pokud toto vyjde jedná se o validní iban, tutíž stačí assignout hodnoty
-        //protože uživatel do pole z nějakého důvodu zadal kompletní iban
-        iban_country_code = val.country_code().to_string();
-        iban_check_digit = val.check_digits().to_string();
-
-        has_sucess = true;
-        sucess_text = "Vložili jste validní IBAN se správnou kontrolní číslicí.".to_string();
-
-
-        let bban: Bban = val.bban();
-
-        //try to parse branch
-        match bban.branch_identifier() {
-            Some(bban_branch) => {
-                iban_bank_code = bban_branch.to_string();
-            }
-            None => {
-                iban_bank_code = "-".to_string();
-            }
-        }
-        //try to parse bank account number
-        match bban.bank_identifier() {
-            Some(bban_acc) => {
-                iban_account_number = bban_acc.to_string();
-            }
-            None => (),
-        }
-        //pokud se nepodařilo parsenout bank account number, hodím do čísla účtu celý bban
-        if iban_bank_code.is_empty() {
-            iban_account_number = bban.as_str().to_string();
-        }
-    }
-    //pokud se nepodaří parsenout iban
-    else {
-        //remove all empty spaces
-        let mut original_iban = input_string.clone();
-        original_iban.retain(|c| !c.is_whitespace());
-
-        //kontrola délky, protože provádím slicing a nejkratší možný valid iban je 15
-        if original_iban.len() >= 15 {
-            //zkontrolovat, zda pouze uživatel nedodal iban kód bez kontrolní číslice
-            let nulovany_iban = format!("{}00{}", &original_iban[..2], &original_iban[2..]);
-
-            let check_digits = 98 - iban::calculate_checksum(nulovany_iban.as_bytes());
-
-            let calculated_iban = format!(
-                "{}{:02}{}",
-                &original_iban[..2],
-                check_digits,
-                &original_iban[2..]
-            );
-            //zde provést kontrolu jestli je to validní iban
-            //jedná se zde o stejný if let jako je nahoře
-            if let Ok(val) = calculated_iban.parse::<Iban>() {
-                //pokud toto vyjde jedná se o validní iban, tutíž stačí assignout hodnoty
-                //protože uživatel do pole z nějakého důvodu zadal kompletní iban
-                iban_country_code = val.country_code().to_string();
-                iban_check_digit = val.check_digits().to_string();
-
-				has_info = true;
-        		info_text = "Vložili jste validní IBAN bez kontrolní číslice. Program kontrolní číslici dopočetl a je zobrazena v poli Kontrola.".to_string();
-
-
-                let bban: Bban = val.bban();
-
-                //try to parse branch
-                match bban.branch_identifier() {
-                    Some(bban_branch) => {
-                        iban_bank_code = bban_branch.to_string();
-                    }
-                    None => {
-                        iban_bank_code = "-".to_string();
-                    }
-                }
-                //try to parse bank account number
-                match bban.bank_identifier() {
-                    Some(bban_acc) => {
-                        iban_account_number = bban_acc.to_string();
-                    }
-                    None => (),
-                }
-                //pokud se nepodařilo parsenout bank account number, hodím do čísla účtu celý bban
-                if iban_bank_code.is_empty() {
-                    iban_account_number = bban.as_str().to_string();
-                }
-            }
-            else{
+        //convert input to list by spaces - if no spaces are included errors will be thrown
+        //because of the lenght of the individual elements
+        let mut fields_vec: Vec<&str> = input_string.split(' ').collect();
+        //remove empty spaces -> ' ' from the vector
+        //remove all spaces from the iban
+        fields_vec.retain(|&c| !c.is_empty());
+        
+        //now opět ve starých kolejích -> kontrolování délky, přičemž první dva znaky budou country code
+        if fields_vec.len() >= 1 {
+            //check jestli je to validní IBAN country code
+            if fields_vec[0].len() != 2{
             	has_error = true;
-            	error_text = "Řetězec znaků co jste zadali není validní IBAN.".to_string();
+            	error_text = "Country kód musí mít přesně 2 znaky.".to_string();
+            }
+            else
+            {
+	            if is_valid_iban_country(fields_vec[0]) {
+	                iban_country_code = fields_vec[0].to_string();
+	            } 
+	            else {
+	                has_error = true;
+	                error_text = "Vložili jste country kód (první 2 alfabetické znaky) buď ve špatném formátu, nebo jste nezadali zemi, která používá IBAR".to_string();
+	            }
+	        }
+        }
+        //další 4 čísla jsou číslem banky
+        //HOAX, může to být 3-8 čísel a nemusí to bý ani čísla
+        //tím, že to nejsou čísla, tak musím odstanit kontrolu numericity
+        if fields_vec.len() >= 2 {
+        	//kontrola délky
+        	if !(fields_vec[1].len() >= 3 && fields_vec[1].len() <= 8){
+        		has_error = true;
+        		error_text = "Číslo banky musí mít nejméně 3 a nejvíce 8 číslic.".to_string();
+        	}
+        	else{      		
+  	            //kontrola numericity
+  	            /*
+	            if fields_vec[1].parse::<u32>().is_err() {
+	                has_error = true;
+	                error_text = "V kódu banky se vyskytují nečíselné znaky.".to_string();
+	            } else {
+	                iban_bank_code = fields_vec[1].to_string();
+	        	}
+	        	*/
+	        	iban_bank_code = fields_vec[1].to_string();
+        	}
+        }
+        //dalších 16 čísel je čístlo účtu a předčíslí
+        //hoax, to IBAN číslo je strašně goofy
+        if fields_vec.len() >= 3 {
+            //kontrola numericity - opťe je třeba použít u64 - moc čísel
+            if fields_vec[2].parse::<u64>().is_err() {
+                has_error = true;
+                error_text = "V čísle účtu se vyskytují nečíselné znaky.".to_string();
+            } else {
+                iban_account_number = fields_vec[2].to_string();
+				//pokud je vše ok sloučit jednotlivé komponenty vektoru a lupnout do Iban
+				let iban_formatted = fields_vec.join("");
+
+				//zformátování iban do formátu pro funkci checksum
+				let iban_formatted = format!("{}00{}", &iban_formatted[..2], &iban_formatted[2..]);
+				//výpočet check digit
+				let cccc = 98 - iban::calculate_checksum(iban_formatted.as_bytes());
+				tracing::info!("{cccc}");
+				tracing::info!("{iban_formatted}");
+				iban_check_digit = (98 - iban::calculate_checksum(iban_formatted.as_bytes())).to_string();
+				
+				//let iban: IbanField = joined_field_vec.parse();
+				/*
+				if let Ok(res) = joined_field_vec.parse::<Iban>(){
+					let iban = res;
+					tracing::info!("Iban je {iban}");
+				}
+				else{
+					has_error = true;
+					error_text = "Invalidní číslo IBAN, nelze parsenout.".to_string();
+				}
+				*/
+				//přidání nulované kontrolní číslice, ať můžu spustit funkci calculate_checksum
+				
+
             }
         }
     }
@@ -176,10 +155,6 @@ pub fn Iban_page() -> Element {
                             // Přepínání tříd při chybě
                             class: {if has_error
                             {"input input-bordered input-error text-error input-lg w-full font-mono"}
-							else if has_sucess
-							{"input input-bordered input-success text-success input-lg w-full font-mono"}
-							else if has_info
-							{"input input-bordered input-info text-info input-lg w-full font-mono"}
                             else
                             {"input input-bordered input-primary input-lg w-full font-mono"}},
                             maxlength: "34", // Maximální teoretická délka IBAN
@@ -192,20 +167,6 @@ pub fn Iban_page() -> Element {
                             label { class: "label py-0",
                                 span { class: "label-text-alt text-error",
                                     "{error_text}"
-                                }
-                            }
-                        }
-                        if has_sucess {
-                            label { class: "label py-0",
-                                span { class: "label-text-alt text-success",
-                                    "{sucess_text}"
-                                }
-                            }
-                        }
-                        if has_info {
-                            label { class: "label py-0",
-                                span { class: "label-text-alt text-info",
-                                    "{info_text}"
                                 }
                             }
                         }
