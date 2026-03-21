@@ -1,7 +1,7 @@
 use crate::Route;
 use dioxus::prelude::*;
 //knihovna na IBAN, protože je to poměrně složité
-use iban::{Iban, Bban};
+use iban::Iban;
 
 //zřejmně nejjednodušší způsob konotroly kódu země - gigantický seznam -> jsou zde pouze země, které užívájí IBAN
 pub const IBAN_COUNTRY_CODES: &[&str] = &[
@@ -68,6 +68,7 @@ pub fn Iban_page() -> Element {
         }
         //další 4 čísla jsou číslem banky
         //HOAX, může to být 3-8 čísel a nemusí to bý ani čísla
+        //tím, že to nejsou čísla, tak musím odstanit kontrolu numericity
         if fields_vec.len() >= 2 {
         	//kontrola délky
         	if !(fields_vec[1].len() >= 3 && fields_vec[1].len() <= 8){
@@ -76,15 +77,19 @@ pub fn Iban_page() -> Element {
         	}
         	else{      		
   	            //kontrola numericity
+  	            /*
 	            if fields_vec[1].parse::<u32>().is_err() {
 	                has_error = true;
 	                error_text = "V kódu banky se vyskytují nečíselné znaky.".to_string();
 	            } else {
 	                iban_bank_code = fields_vec[1].to_string();
 	        	}
+	        	*/
+	        	iban_bank_code = fields_vec[1].to_string();
         	}
         }
         //dalších 16 čísel je čístlo účtu a předčíslí
+        //hoax, to IBAN číslo je strašně goofy
         if fields_vec.len() >= 3 {
             //kontrola numericity - opťe je třeba použít u64 - moc čísel
             if fields_vec[2].parse::<u64>().is_err() {
@@ -93,15 +98,29 @@ pub fn Iban_page() -> Element {
             } else {
                 iban_account_number = fields_vec[2].to_string();
 				//pokud je vše ok sloučit jednotlivé komponenty vektoru a lupnout do Iban
-				let joined_field_vec = fields_vec.join("");
+				let iban_formatted = fields_vec.join("");
+
+				//zformátování iban do formátu pro funkci checksum
+				let iban_formatted = format!("{}00{}", &iban_formatted[..2], &iban_formatted[2..]);
+				//výpočet check digit
+				let cccc = 98 - iban::calculate_checksum(iban_formatted.as_bytes());
+				tracing::info!("{cccc}");
+				tracing::info!("{iban_formatted}");
+				iban_check_digit = (98 - iban::calculate_checksum(iban_formatted.as_bytes())).to_string();
+				
 				//let iban: IbanField = joined_field_vec.parse();
+				/*
 				if let Ok(res) = joined_field_vec.parse::<Iban>(){
-					let iban: Iban = res;
+					let iban = res;
+					tracing::info!("Iban je {iban}");
 				}
 				else{
 					has_error = true;
 					error_text = "Invalidní číslo IBAN, nelze parsenout.".to_string();
 				}
+				*/
+				//přidání nulované kontrolní číslice, ať můžu spustit funkci calculate_checksum
+				
 
             }
         }
