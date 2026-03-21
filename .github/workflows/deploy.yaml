@@ -1,18 +1,15 @@
 name: Deploy Dioxus 0.7 to GitHub Pages
 
-# Run this workflow every time you push to the main branch
 on:
   push:
     branches:
       - main 
 
-# Grant the necessary permissions for GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Prevent multiple deployments from running at the same time
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -32,32 +29,30 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
-      # Use cargo-binstall to grab the pre-compiled Dioxus CLI instantly
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@main
 
       - name: Install Dioxus CLI
         run: cargo binstall dioxus-cli -y
 
-      # Build the Dioxus WebAssembly bundle in release mode
+      # We add --no-wasm-opt to prevent the pipeline from crashing on the Ubuntu runner
+      # (You can remove this flag in the future if they patch the wasm-opt runner issue)
       - name: Build the App
-        run: dx build --release
+        run: dx build --release --no-wasm-opt
 
-      # The SPA Routing Fix: Copies index.html to 404.html
-      # This ensures direct links to /about or /contact don't break on GitHub Pages
+      # Copy index.html to 404.html using the NEW Dioxus 0.7 output path
       - name: Create 404 fallback for Router
-        run: cp dist/index.html dist/404.html
+        run: cp target/dx/ak2tp-projekt/release/web/public/index.html target/dx/ak2tp-projekt/release/web/public/404.html
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
 
-      # Upload the Dioxus output directory ('dist') to GitHub Actions
+      # Upload the exact folder Dioxus outputted
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: './target/dx/ak2tp-projekt/release/web/public'
 
-      # Deploy the artifact to GitHub Pages
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
