@@ -1,0 +1,63 @@
+name: Deploy Dioxus 0.7 to GitHub Pages
+
+# Run this workflow every time you push to the main branch
+on:
+  push:
+    branches:
+      - main 
+
+# Grant the necessary permissions for GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Prevent multiple deployments from running at the same time
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      # Use cargo-binstall to grab the pre-compiled Dioxus CLI instantly
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Install Dioxus CLI
+        run: cargo binstall dioxus-cli -y
+
+      # Build the Dioxus WebAssembly bundle in release mode
+      - name: Build the App
+        run: dx build --release
+
+      # The SPA Routing Fix: Copies index.html to 404.html
+      # This ensures direct links to /about or /contact don't break on GitHub Pages
+      - name: Create 404 fallback for Router
+        run: cp dist/index.html dist/404.html
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+
+      # Upload the Dioxus output directory ('dist') to GitHub Actions
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      # Deploy the artifact to GitHub Pages
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

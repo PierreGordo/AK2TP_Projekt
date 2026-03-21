@@ -4,6 +4,7 @@
 
 # HTML title tag content
 title = "ak2tp-projekt"
+base_path = "/AK2TP_Projekt"
 
 # include `assets` in web platform
 [web.resource]
