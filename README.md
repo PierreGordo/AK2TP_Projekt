@@ -1,50 +1,36 @@
-# Development
+# Generátor detekčních kódů
 
-Your new bare-bones project includes minimal organization with a single `main.rs` file and a few assets.
+Interaktivní webová aplikace postavená na jazyce Rust (za použití frameworku [Dioxus](https://dioxuslabs.com/)) umožňující analýzu a generování kontrolních číslic pro běžně používané identifikátory a standardní kódy. Cílem projektu je demonstrovat využití modulo aritmetiky jako obrany proti chybám a překlepům.
 
-```
-project/
-├─ assets/ # Any assets that are used by the app should be placed here
-├─ src/
-│  ├─ main.rs # main.rs is the entry point to your application and currently contains all components for the app
-├─ Cargo.toml # The Cargo.toml file defines the dependencies and feature flags for your project
-```
+## Podporované formáty
 
-### Automatic Tailwind (Dioxus 0.7+)
+- **Rodné číslo (RČ)** - Validace a výpočet kontrolní číslice pomocí modulo 11.
+- **ISBN-13** - Mezinárodní číslo knihy, výpočet modulo 10.
+- **EAN-13** - Standardní čárové kódy zboží, výpočet modulo 10 (váhování 1, 3).
+- **IBAN** - Mezinárodní formát čísla bankovního účtu, ověření modulo 97.
 
-As of Dioxus 0.7, there no longer is a need to manually install tailwind. Simply `dx serve` and you're good to go!
+## Struktura projektu
 
-Automatic tailwind is supported by checking for a file called `tailwind.css` in your app's manifest directory (next to Cargo.toml). To customize the file, use the dioxus.toml:
+- `src/main.rs` - Hlavní `Router` a rozcestník (UI domovské stránky).
+- `src/algorithms.rs` - Jádro matematických algoritmů obsahující výpočty pro jednotlivé formáty.
+- `src/...` - Specifické UI moduly komponent (`rodne_cislo.rs`, `ean13.rs`, `isbn.rs`, `iban_page.rs`).
 
-```toml
-[application]
-tailwind_input = "my.css"
-tailwind_output = "assets/out.css" # also customize the location of the out file!
-```
+## Dokumentace
 
-### Tailwind Manual Install
+Podrobnější uživatelská a technická HTML dokumentace se nachází v souboru `dokumentace.html` umístěném v kořenovém adresáři.
 
-To use tailwind plugins or manually customize tailwind, you can can install the Tailwind CLI and use it directly.
+## Instalace a spuštění (Dioxus 0.7+)
 
-### Tailwind
-1. Install npm: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
-2. Install the Tailwind CSS CLI: https://tailwindcss.com/docs/installation/tailwind-cli
-3. Run the following command in the root of the project to start the Tailwind CSS compiler:
+Projekt využívá Dioxus 0.7 s automatickou integrací Tailwind CSS. 
 
-```bash
-npx @tailwindcss/cli -i ./input.css -o ./assets/tailwind.css --watch
-```
+1. Ujistěte se, že máte nainstalovaný jazyk [Rust](https://www.rust-lang.org/tools/install).
+2. Nainstalujte nástroj `dx` pro Dioxus (případně použijte `cargo install dioxus-cli`):
+   ```bash
+   curl -sSL http://dioxus.dev/install.sh | sh
+   ```
+3. Spusťte aplikaci příkazem v kořenu projektu:
+   ```bash
+   dx serve
+   ```
 
-### Serving Your App
-
-Run the following command in the root of your project to start developing with the default platform:
-
-```bash
-dx serve
-```
-
-To run for a different platform, use the `--platform platform` flag. E.g.
-```bash
-dx serve --platform desktop
-```
-
+Aplikace bude poté automaticky dostupná přes prohlížeč na `http://localhost:8080`.

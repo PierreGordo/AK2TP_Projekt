@@ -239,7 +239,6 @@ pub fn Isbn() -> Element {
                 }
             }
 
-            // SPODNÍ ČÁST: POSTUP A EXPERIMENTÁLNÍ FUNKCE (API)
             div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
 
                 // Matematický postup
