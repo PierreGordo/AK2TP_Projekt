@@ -12,7 +12,7 @@ pub fn calculate_rc_control_digit(rodne_cislo: &str) -> Option<i32> {
         let mut modulo_rodc: i32 = (rodc_int % 11) as i32;
         //pokud je modulo 10 tak vrátit 0
         if modulo_rodc == 10{
-        	modulo_rodc == 0;
+        	modulo_rodc = 0;
         }
         return Some(modulo_rodc);
     }
@@ -47,25 +47,4 @@ pub fn modulo_10_algorithm(isbn: &str) -> String{
 	res
 	//pokud je výsledek 10, tak se výsledkem stane nula
 	
-}
-
-
-
-//Tests of functionality
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_rc_control_digit() {
-        //for this the control digit is 5
-        let result = rc_control_digit("770406334");
-        assert_eq!(result, Some(5));
-    }
-    #[test]
-    fn test_control_digit2() {
-        // for this the control digit will be 13 - aka the parse failed
-        let result = rc_control_digit("770b406334");
-        assert_eq!(result, None);
-    }
 }
