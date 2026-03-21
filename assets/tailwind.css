@@ -30,6 +30,9 @@
     --font-weight-bold: 700;
     --tracking-widest: 0.1em;
     --leading-tight: 1.25;
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
   }
@@ -997,6 +1000,9 @@
   .text-secondary {
     color: var(--color-secondary);
   }
+  .text-success {
+    color: var(--color-success);
+  }
   .uppercase {
     text-transform: uppercase;
   }
@@ -1090,10 +1096,24 @@
       }
     }
   }
+  .input-info {
+    @layer daisyui.l1.l2 {
+      &, &:focus, &:focus-within {
+        --input-color: var(--color-info);
+      }
+    }
+  }
   .input-primary {
     @layer daisyui.l1.l2 {
       &, &:focus, &:focus-within {
         --input-color: var(--color-primary);
+      }
+    }
+  }
+  .input-success {
+    @layer daisyui.l1.l2 {
+      &, &:focus, &:focus-within {
+        --input-color: var(--color-success);
       }
     }
   }
