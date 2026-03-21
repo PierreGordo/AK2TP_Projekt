@@ -62,7 +62,7 @@ fn Home() -> Element {
                 div { class: "max-w-3xl",
 
                     h1 { class: "text-5xl font-bold text-primary mb-6",
-                        "Generátor detekčních kódů"
+                        "Kalkulátor a validátor kontrolních čísel"
                     }
 
                     p { class: "text-lg text-base-content/80 mb-8",
