@@ -134,7 +134,7 @@ fn Home() -> Element {
                         button {
                             class: "btn btn-outline btn-warning btn-lg",
                             onclick: move |_| { nav.push(Route::KreditniKarta {}); },
-                            "Luhnův algoritmus (Karty a IMEI)"
+                            "Luhnův algoritmus (Platební karty)"
                         }
                         button {
                             class: "btn btn-outline btn-error btn-lg",

@@ -5,13 +5,19 @@ use crate::Route;
 pub fn KreditniKarta() -> Element {
     let nav = use_navigator();
     let mut input_value = use_signal(|| String::new());
-
-    let has_error = false;
-    let error_text = "Příklad chyby";
     
-    let card_bin = "453201";
-    let card_account = "23456789";
-    let card_control_digit = "0";
+    let mut has_error = false;
+    let mut error_text = String::new();
+
+    let mut has_success = false;
+    let mut success_text = String::new();
+
+    let mut has_info = false;
+    let mut info_text = String::new();
+    
+    let mut card_bin = String::new();
+    let mut card_account = String::new();
+    let mut card_control_digit = String::new();
 
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
@@ -27,7 +33,7 @@ pub fn KreditniKarta() -> Element {
 
                     div { class: "form-control w-full",
                         label { class: "label",
-                            span { class: "label-text font-semibold", "Vložte číslo platební karty." }
+                            span { class: "label-text font-semibold", "Vložte číslo platební karty. (pouze VISA nebo MasterCard)" }
                         }
                         input {
                             r#type: "text",
