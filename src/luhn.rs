@@ -158,13 +158,13 @@ pub fn KreditniKarta() -> Element {
                 h3 { class: "text-xl font-bold", "Postup výpočtu kontrolní číslice (Luhn)" }
                 div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
                     pre { "data-prefix": ">",
-                        code { "1. Postupuje se zprava doleva (od předposlední číslice)." }
+                        code { "1. Postupuje se zprava doleva (pokud je v čísle kontrolní číslice, vynechává se)." }
                     }
                     pre { "data-prefix": ">",
                         code { "2. Každá druhá číslice se vynásobí dvěma." }
                     }
                     pre { "data-prefix": ">",
-                        code { "3. Pokud je výsledek > 9, sečtou se jeho cifry (nebo se odečte 9)." }
+                        code { "3. Pokud je výsledek > 9, odečte se 9." }
                     }
                     pre { "data-prefix": ">",
                         code { "4. Všechny číslice se sečtou." }

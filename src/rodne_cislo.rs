@@ -234,16 +234,10 @@ pub fn Rodne_cislo() -> Element {
                         code { "V programování používáme operátor % (modulo)." }
                     }
                     pre { "data-prefix": ">",
-                        code { "Zbytek po vydělení prvních 9 číslic číslem 11" }
+                        code { "Zbytek po vydělení prvních 9 číslic číslem 11 se stává kontrolní číslicí." }
                     }
                     pre { "data-prefix": ">",
-                        code { "se stává kontrolní číslicí." }
-                    }
-                    pre { "data-prefix": ">",
-                        code { "Výjimka: Pokud je zbytek 10," }
-                    }
-                    pre { "data-prefix": ">",
-                        code { "kontrolní číslice je 0." }
+                        code { "Výjimka: Pokud je zbytek 10, kontrolní číslice je 0." }
                     }
                 }
             }
