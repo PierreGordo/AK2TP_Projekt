@@ -7,60 +7,123 @@
     <style>
         :root {
             --primary-color: #2563eb;
-            --bg-color: #f8fafc;
-            --text-color: #1e293b;
-            --code-bg: #f1f5f9;
-            --border-color: #e2e8f0;
+            --secondary-color: #1d4ed8;
+            --bg-color: #f3f4f6;
+            --surface-color: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --code-bg: #1e293b;
+            --code-text: #f8fafc;
+            --border-color: #e5e7eb;
+            --accent-bg: #eff6ff;
+            --radius: 10px;
         }
+
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
+            line-height: 1.7;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 2rem 1rem;
         }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: var(--surface-color);
+            padding: 3rem;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
         h1, h2, h3 {
+            color: var(--text-main);
+            margin-top: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
             color: var(--primary-color);
+            border-bottom: 4px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 0.5rem;
-            margin-top: 2rem;
         }
-        h1 { font-size: 2.2rem; }
-        h2 { font-size: 1.8rem; }
-        h3 { font-size: 1.4rem; border-bottom: none; }
-        
-        .explanation {
-            background-color: #eff6ff;
-            border-left: 4px solid var(--primary-color);
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
+
+        h3 {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
-        pre {
-            background-color: var(--code-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            overflow-x: auto;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.85rem;
+
+        h3::before {
+            content: "📄";
+            font-size: 1.2rem;
         }
         
-        code {
-            font-family: 'Consolas', 'Monaco', monospace;
+        p, li {
+            color: var(--text-muted);
+            font-size: 1.05rem;
         }
 
         ul {
             padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        strong {
+            color: var(--text-main);
+        }
+        
+        .explanation {
+            background-color: var(--accent-bg);
+            border-left: 5px solid var(--primary-color);
+            padding: 1.2rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            font-size: 1rem;
+            color: var(--secondary-color);
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            tab-size: 4;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        /* Tiskové styly pro případný export do PDF */
         @media print {
-            body { padding: 0; max-width: 100%; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; padding: 0; max-width: 100%; }
             .page-break { page-break-before: always; }
-            pre { page-break-inside: auto; border: 1px solid #ccc; white-space: pre-wrap; word-wrap: break-word; }
+            pre { page-break-inside: auto; background-color: #f1f5f9; color: black; border: 1px solid #ccc; white-space: pre-wrap; word-wrap: break-word; }
             h2, h3 { page-break-after: avoid; }
             .explanation { page-break-inside: avoid; }
         }
@@ -68,52 +131,60 @@
 </head>
 <body>
 
+<div class="container">
     <h1>Dokumentace k programu: Kalkulátor a validátor kontrolních čísel</h1>
 
     <h2>1. Popis programu</h2>
     <p>
         Tento program je webová aplikace vytvořená v programovacím jazyce Rust za pomoci frameworku Dioxus. 
-        Slouží k výpočtu, analýze a validaci kontrolních číslic u běžně používaných identifikačních formátů: Rodné číslo, ISBN-13, EAN-13 a IBAN.
-        Aplikace vizualizuje jednotlivé složky těchto kódů a ukazuje principy modulo aritmetiky, která se k tvorbě kontrolních číslic využívá.
+        Slouží k výpočtu, analýze a validaci kontrolních číslic u běžně používaných identifikačních formátů: Rodné číslo, ISBN-13, EAN-13, IBAN, IČO a čísel platebních karet (Luhnův algoritmus).
+        Aplikace vizualizuje jednotlivé složky těchto kódů a ukazuje principy modulo aritmetiky, která se k tvorbě kontrolních číslic hojně využívá za účelem zabezpečení dat proti chybám při přenosu či ručním přepisu.
     </p>
 
     <h2>2. Popis funkcí programu</h2>
     <ul>
-        <li><strong>Analýza Rodného čísla:</strong> Program přijímá prvních 9 číslic rodného čísla. Kontroluje, zda vstup obsahuje pouze číselné znaky, a pomocí algoritmu Modulo 11 vypočítá 10. kontrolní číslici.</li>
+        <li><strong>Analýza Rodného čísla:</strong> Program přijímá prvních 9 číslic rodného čísla. Kontroluje, zda vstup obsahuje pouze číselné znaky, a pomocí algoritmu Modulo 11 vypočítá 10. kontrolní číslici. V případě validního vstupu rozpadne číslo na logické celky (rok, měsíc, den, koncovka).</li>
         <li><strong>Analýza ISBN-13:</strong> Program zpracovává 12místný vstup oddělený pomlčkami. Verifikuje délku jednotlivých částí (prefix, skupina, vydavatel, publikace) a počítá 13. kontrolní číslici pomocí algoritmu Modulo 10 (střídavé násobení vahami 1 a 3).</li>
-        <li><strong>Analýza EAN-13:</strong> Aplikace parsuje souvislý 12místný číselný řetězec, který dělí na GS1 prefix, kód výrobce a kód produktu. Kontrolní číslice je počítána stejným algoritmem (Modulo 10) jako u formátu ISBN.</li>
-        <li><strong>Analýza IBAN:</strong> Program se primárně pokouší o validaci celého zadaného kódu IBAN pomocí externí knihovny. Pokud uživatel zadá platný kód bez kontrolního dvojčíslí, program toto dvojčíslí dopočítá aplikací algoritmu Modulo 97 a následně zkompletovaný IBAN zvaliduje.</li>
+        <li><strong>Analýza EAN-13:</strong> Aplikace parsuje souvislý 12místný číselný řetězec, který dělí na GS1 prefix, kód výrobce a kód produktu. Kontrolní číslice je počítána stejným algoritmem (Modulo 10) jako u formátu ISBN. Kód se také vizualizuje jako SVG čárový kód pomocí knihovny <code>barcoders</code>.</li>
+        <li><strong>Analýza IBAN:</strong> Program se primárně pokouší o validaci celého zadaného kódu IBAN pomocí externí knihovny <code>iban</code>. Pokud uživatel zadá platný kód bez kontrolního dvojčíslí, program toto dvojčíslí dopočítá aplikací algoritmu Modulo 97 (po vložení nul a aplikaci matematického vzorce) a následně zkompletovaný IBAN zvaliduje a rozčlení.</li>
+        <li><strong>Analýza IČO (Identifikační číslo osoby):</strong> Program přijímá vstup o 7 nebo 8 znacích. V případě 7 znaků vypočítá 8. kontrolní číslici pomocí modula 11 s váhami (8, 7, 6, 5, 4, 3, 2). Pokud je vloženo 8 znaků, validuje, zda zadaná kontrolní číslice odpovídá výpočtu.</li>
+        <li><strong>Luhnův algoritmus (Kreditní karty):</strong> Nástroj pro validaci čísel platebních karet. Pokud je zadáno 15 čísel, program dopočítá 16. kontrolní číslici (postup zprava doleva, násobení každé druhé číslice dvěma, sčítání cifer). Pokud je zadáno 16 čísel, proběhne ověření.</li>
     </ul>
 
     <div class="page-break"></div>
 
     <h2>3. Zdrojový text programu a vysvětlivky</h2>
     <p>
-        Zdrojový kód je napsán v jazyce Rust. Pro ošetření chyb (např. při parsování textu na čísla) využívá typy <code>Option</code> a <code>Result</code>, které zajišťují bezpečný běh aplikace i při zadání nestandardních vstupů.
+        Zdrojový kód je napsán v jazyce Rust a uživatelské rozhraní je tvořeno pomocí frameworku Dioxus přes makro <code>rsx!</code> a Tailwind CSS pro stylování. Kód důsledně využívá vlastnosti jazyka Rust, jako je pattern matching (<code>if let</code>, <code>match</code>), Result a Option pro bezpečné ošetření vstupů bez pádů (panics) aplikace. Níže jsou uvedeny kompletní zdrojové kódy všech modulů s komentáři.
     </p>
 
-    <h3>3.1. Soubor: <code>main.rs</code></h3>
+    <h3>Soubor: main.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Tento soubor tvoří vstupní bod aplikace. Konfiguruje routování (směrování) mezi jednotlivými pohledy pomocí výčtového typu <code>Route</code> a inicializuje hlavní rozhraní (komponenta <code>Home</code>), odkud uživatel přistupuje k jednotlivým validátorům. Zápis uživatelského rozhraní využívá makro <code>rsx!</code>, které převádí strukturu podobnou HTML do kódu v Rustu.
+        <strong>Vysvětlivka:</strong> Tento soubor tvoří vstupní bod aplikace. Definuje modulární strukturu (nahrání ostatních `.rs` souborů jako modulů), konfiguruje routování (směrování) mezi jednotlivými obrazovkami pomocí výčtového typu <code>Route</code> a inicializuje hlavní rozhraní (komponenta <code>Home</code>). Zde se generuje úvodní rozcestník (menu) s tlačítky pro přechod na jednotlivé nástroje.
     </div>
 <pre><code>use dioxus::prelude::*;
-
+//for algos
 mod algorithms;
-
+//for rodne cislo ui and functionality
 mod rodne_cislo;
 use rodne_cislo::Rodne_cislo;
-
+//for logging - remove later when app complete
 use tracing;
-
+//for isbn UI and functionality
 mod isbn;
 use isbn::Isbn;
-
+//for ean-13 UI and functionality
 mod ean13;
 use ean13::Ean13;
-
+//for IBAN UI and functionality
 mod iban_page;
 use iban_page::Iban_page;
-
+//for ICO ui and functionality
+mod ico;
+use ico::Ico;
+//for lohn ui and functionality
+mod luhn;
+use luhn::KreditniKarta;
 
 #[derive(Clone, Debug, PartialEq, Routable)]
 pub enum Route {
@@ -131,21 +202,31 @@ pub enum Route {
 
     #[route("/iban")]
     Iban_page,
+
+    #[route("/ico")]
+    Ico,
+
+    #[route("/luhn")]
+    KreditniKarta,
 }
 
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
 
 fn main() {
+    //for logging - remove later when app complete
     dioxus::launch(|| {
         rsx! {
+            //tailwind css
             document::Stylesheet { href: TAILWIND_CSS }
             Router::&lt;Route&gt; {}
         }
     });
 }
 
+//Function for landing page ui, mainly ui in this one, so nothing to coment about
 #[component]
 fn Home() -> Element {
+    //for navigation - encasing the whole button messes up the alighment for some reason
     let nav = use_navigator();
 
     rsx! {
@@ -184,19 +265,36 @@ fn Home() -> Element {
                             },
                             "ISBN-13"
                         }
-                        button { class: "btn btn-outline btn-accent btn-lg", 
-								onclick: move |_| {
-									nav.push(Route::Ean13 {});
-								},
-                        "EAN-13" }
+                        button {
+                            class: "btn btn-outline btn-accent btn-lg",
+                            onclick: move |_| {
+                                nav.push(Route::Ean13 {});
+                            },
+                            "EAN-13"
+                        }
 
                         button {
                             class: "btn btn-outline btn-info btn-lg",
+                            //route here
                             onclick: move |_| {
                                 nav.push(Route::Iban_page {});
                             },
                             "IBAN"
                         
+                        }
+                        button {
+                            class: "btn btn-outline btn-success btn-lg",
+                            onclick: move |_| {
+                                nav.push(Route::Ico {});
+                            },
+                            "IČO (Identifikační číslo osoby)"
+                        }
+                        button {
+                            class: "btn btn-outline btn-warning btn-lg",
+                            onclick: move |_| {
+                                nav.push(Route::KreditniKarta {});
+                            },
+                            "Luhnův algoritmus (Platební karty)"
                         }
                     }
                 }
@@ -208,16 +306,25 @@ fn Home() -> Element {
 
     <div class="page-break"></div>
 
-    <h3>3.2. Soubor: <code>algorithms.rs</code></h3>
+    <h3>Soubor: algorithms.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Soubor obsahuje sdílené matematické funkce nezávislé na uživatelském rozhraní. <code>calculate_rc_control_digit</code> ověřuje, zda lze vstup parsovat na celé číslo (typ i64) a následně provádí operaci modulo 11. Funkce <code>modulo_10_algorithm</code> iteruje přes jednotlivé znaky řetězce (ISBN/EAN), převádí je na čísla a na základě střídavého příznaku <code>multiply_by_3</code> provádí výpočet váženého součtu.
+        <strong>Vysvětlivka:</strong> Soubor obsahuje sdílené matematické funkce pro výpočty kontrolních číslic nezávisle na uživatelském rozhraní. Zahrnuje: <code>calculate_rc_control_digit</code> (modulo 11 pro rodná čísla), <code>modulo_10_algorithm</code> (střídavé násobení 1 a 3 pro ISBN/EAN), <code>ico_control_digit</code> (modulo 11 s váhami pro IČO) a <code>luhn_algo</code> (čísla platebních karet s iterací pozpátku a zdvojnásobením lichých pozic). Tyto funkce jsou volány z UI komponent, aby se oddělila logika od vykreslování.
     </div>
-<pre><code>pub fn calculate_rc_control_digit(rodne_cislo: &amp;str) -> Option&lt;i32&gt; {
+<pre><code>// Zde v tomto souboru jsou všechny algoritmy výpočtu kontrolních číslic
+
+//rodne cislo kotrnolní číslice
+//Vstupem je zadané 9 (bez kontrolního čísla na konci) místné rodné číslo: ve stvaru String
+pub fn calculate_rc_control_digit(rodne_cislo: &amp;str) -> Option&lt;i32&gt; {
+    //Vzatí prvních 9 digitů (pokud uživatel zadá 10, tak chci rovnou provést kontrolu)
+    // why does this work wtf? reference to reference to string? huh?
+    //let rc_copy = &amp;rodne_cislo[..9];
+    //BUT HERE IT TAKES WITHOUT REFERENCE HUHUHUHUU? bro i suck at rust
     if let Ok(val) = rodne_cislo[..9].parse() {
         let rodc_int: i64 = val;
         let mut modulo_rodc: i32 = (rodc_int % 11) as i32;
-        if modulo_rodc == 10{
-        	modulo_rodc = 0;
+        //pokud je modulo 10 tak vrátit 0
+        if modulo_rodc == 10 {
+            modulo_rodc = 0;
         }
         return Some(modulo_rodc);
     }
@@ -225,58 +332,129 @@ fn Home() -> Element {
     None
 }
 
-pub fn modulo_10_algorithm(isbn: &amp;str) -> String{
-	let mut sum: i32 = 0;
-	let mut multiply_by_3: bool = false;
-	
-	for s_num in isbn.chars(){
-		if multiply_by_3{
-			sum += (s_num.to_digit(10).unwrap() as i32) * 3;
-			multiply_by_3 = !multiply_by_3;
-		}
-		else{
-			sum += s_num.to_digit(10).unwrap() as i32;
-			multiply_by_3 = !multiply_by_3;
-		}
-	}
+//Zde algoritmus jak pro EAN-13 tak pro ISBN - aka modulo 10 a nastřídačku *1 a *3
+pub fn modulo_10_algorithm(isbn: &amp;str) -> String {
+    //parse the string to numbers
+    //zde už víme, že máme plné 12 místné isbn, bez kontrolní číslice a zároveň víme, že se skutečně jedná o číslo.
+    let mut sum: i32 = 0;
+    let mut multiply_by_3: bool = false;
 
-	let mut res = (10-(sum%10)).to_string();
-	if res == "10"{
-		res = "0".to_string();
-	}
-	res
+    for s_num in isbn.chars() {
+        if multiply_by_3 {
+            //zde je 10, protože se pohybujeme v desítkové sustavě
+            sum += (s_num.to_digit(10).unwrap() as i32) * 3;
+            multiply_by_3 = !multiply_by_3;
+        } else {
+            sum += s_num.to_digit(10).unwrap() as i32;
+            multiply_by_3 = !multiply_by_3;
+        }
+    }
+
+    //zbytek po vydělení součtu 10 a odečtění tohoto čísla od čisla 10
+    let mut res = (10 - (sum % 10)).to_string();
+    if res == "10" {
+        res = "0".to_string();
+    }
+    res
+    //pokud je výsledek 10, tak se výsledkem stane nula
+}
+
+//algoritmus na výpočet kontrolní číslice IČO
+pub fn ico_control_digit(ico: &amp;str) -> String {
+    //předpokládám, že dostaneme validní IČO číslici (7 čísel - chybí kontrolní číslice)
+    //proto zde nebudu zde provádět žádné kontroly.
+    let mut total = 0;
+    //zpětný for loop - váhy
+    //je tam 9, protože indexing
+    for (counter, number) in ico.chars().enumerate() {
+        //ochrana proti 8 místnému ičo, sice by nemělo být ale kdo ví
+        if counter &gt;= 7 {
+            break;
+        }
+        //pokus o castnutí elemenut v 10 soustavě
+        if let Some(val) = number.to_digit(10) {
+            total += val * (8 - (counter as u32));
+        }
+    }
+
+    //Výpočet kontrolní číslice ičo
+    let control_digit = (11 - (total % 11)) % 10;
+    //Vzít číslo a převést na string
+    control_digit.to_string()
+}
+
+//luhnuv algoritmus pro karty
+//celý algoritmus funguje tak, že jede číslem pozpátku, násobí liché indexy 2 a sudé přičítá bez násobení, pokud je vynásobený index větší jak 9, odečte se od něj 9
+//poté se provede (10 -(sum%10))%10; a tím vznikne kontrolní číslice
+pub fn luhn_algo(number: &amp;str) -> String {
+    //počítám s tím, že dostanu 15 místné číslo (číslo karty bez kontrolní číslice)
+    let mut sum = 0;
+    let mut is_odd = true; // ze základu je odd, protože je odebraná kontrolní číslice a jede se pozpátku
+
+    for num in number.chars().rev() {
+        //cast charu na číslo v desítkové soustavě
+        if let Some(val) = num.to_digit(10) {
+            if is_odd {
+                let multiply = val * 2;
+                if multiply &gt; 9 {
+                    sum += multiply - 9;
+                } else {
+                    sum += multiply;
+                }
+            } else {
+                sum += val;
+            }
+            is_odd = !is_odd;
+        }
+    }
+
+    let res = (10 - (sum % 10)) % 10;
+    res.to_string()
 }
 </code></pre>
 
     <div class="page-break"></div>
 
-    <h3>3.3. Soubor: <code>rodne_cislo.rs</code></h3>
+    <h3>Soubor: rodne_cislo.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Tato komponenta zpracovává rodné číslo. Při zadávání hodnot do textového pole (reprezentovaného signálem <code>input_value</code>) program automaticky kontroluje délku řetězce. Pomocí metody <code>get()</code> bezpečně extrahuje dílčí části (rok, měsíc, den, koncovka) a ověřuje jejich formát parsováním na typ u32. Jakmile je k dispozici 9 znaků, spustí algoritmus na dopočet kontrolní číslice.
+        <strong>Vysvětlivka:</strong> Tato komponenta zpracovává rodné číslo. Při zadávání hodnot do textového pole (reprezentovaného signálem <code>input_value</code>) program automaticky kontroluje délku řetězce. Pomocí metody <code>get()</code> bezpečně extrahuje dílčí části (rok, měsíc, den, koncovka) a ověřuje jejich numerický formát. Jakmile uživatel zadá 9 znaků, zavolá algoritmus pro výpočet kontrolní číslice a zobrazí výsledek v pěkných vizuálních blocích.
     </div>
 <pre><code>use dioxus::prelude::*;
 use crate::Route;
+//pro algoritmus výpočtu kontrolní číslice rodného čísla
 use crate::algorithms::calculate_rc_control_digit;
 
 #[component]
 pub fn Rodne_cislo() -> Element {
     let nav = use_navigator();
 
+    //Vstup do input field
     let mut input_value = use_signal(|| String::new());
 
+    //rok
     let mut rc_rok = String::new();
     let mut rc_mesic = String::new();
     let mut rc_den = String::new();
     let mut rc_koncovka = String::new();
     let mut rc_control_digit = String::new();
 
+    //error handlign
     let mut has_error = false;
     let mut error_text = String::new();
 
+	//Check zda je vstupní pole prázdné
     if !input_value.is_empty() {
+    	//Vstup ve stringu pro jednodušší manipulaci
+    	//Zavolání input_value() z toho vyplývá výsledek typ String
     	let input_string = input_value();
-    	if input_string.len() >= 2 &amp;&amp; !has_error{
+    	//je v řetězci dost znaků pro rok
+    	if input_string.len() &gt;= 2 &amp;&amp; !has_error{
+    		//experiment String.get() - non panicking slice
     		if let Some(val) = input_string.get(0..2){
+    									//String.get returns str i think
+    									//so i have to do to_string
+				//check jestli se jedná o číslo
+				//check zda se nevyskytují nečíselné charaktery
     			if val.parse::&lt;u32&gt;().is_err(){
     				has_error = true;
     				error_text = "V zadaném rodném čísle (políčko rok) se vyskytují nečíselné znaky.".to_string();
@@ -287,8 +465,14 @@ pub fn Rodne_cislo() -> Element {
     		}
     	} 
 
-    	if input_string.len() >= 4 &amp;&amp; !has_error{
+    	//je v řetězci dost znaků pro měsíc
+    	if input_string.len() &gt;= 4 &amp;&amp; !has_error{
+    		//experiment String.get() - non panicking slice
     		if let Some(val) = input_string.get(2..4){
+    									//String.get returns str i think
+    									//so i have to do to_string
+				//check jestli se jedná o číslo
+				//check zda se nevyskytují nečíselné charaktery
     			if val.parse::&lt;u32&gt;().is_err(){
     				has_error = true;
     				error_text = "V zadaném rodném čísle (políčko měsíc) se vyskytují nečíselné znaky.".to_string();
@@ -298,9 +482,14 @@ pub fn Rodne_cislo() -> Element {
     			}
     		}
     	} 
-    	
-    	if input_string.len() >= 6 &amp;&amp; !has_error{
+    	//kontrola zda je dost pro den
+    	if input_string.len() &gt;= 6 &amp;&amp; !has_error{
+    		//experiment String.get() - non panicking slice
     		if let Some(val) = input_string.get(4..6){
+    									//String.get returns str i think
+    									//so i have to do to_string
+				//check jestli se jedná o číslo
+				//check zda se nevyskytují nečíselné charaktery
     			if val.parse::&lt;u32&gt;().is_err(){
     				has_error = true;
     				error_text = "V zadaném rodném čísle (políčko den) se vyskytují nečíselné znaky.".to_string();
@@ -311,26 +500,35 @@ pub fn Rodne_cislo() -> Element {
     			
     		}
     	} 
-    	
-    	if input_string.len() >= 9 &amp;&amp; !has_error{
+    	//kontrola zda je dost pro koncovku
+    	if input_string.len() &gt;= 9 &amp;&amp; !has_error{
+    		//experiment String.get() - non panicking slice
     		if let Some(val) = input_string.get(6..9){
+    									//String.get returns str i think
+    									//so i have to do to_string
+				//check jestli se jedná o číslo
+				//check zda se nevyskytují nečíselné charaktery
     			if val.parse::&lt;u32&gt;().is_err(){
     				has_error = true;
     				error_text = "V zadaném rodném čísle (políčko den) se vyskytují nečíselné znaky.".to_string();
     			}
     			else{
     					rc_koncovka = val.to_string();
+    					//nyní už máme dostatečně dlouhý řetězec a ve správném tvaru
     					if let Some(rc_cd) = calculate_rc_control_digit(&amp;input_string){
     						rc_control_digit = rc_cd.to_string();
     				}
     			}
     		}
     	}
+
+    	
     }
 
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
 
+            // Horní navigace / Zpět
             button {
                 class: "btn btn-ghost gap-2",
                 onclick: move |_| {
@@ -339,6 +537,7 @@ pub fn Rodne_cislo() -> Element {
                 "Zpět na výběr"
             }
 
+            // HLAVNÍ KARTA S FORMULÁŘEM A VIZUALIZACÍ
             div { class: "card bg-base-100 shadow-xl border border-base-300",
                 div { class: "card-body",
                     h2 { class: "card-title text-2xl mb-4", "Analýza rodného čísla (RČ)" }
@@ -352,87 +551,120 @@ pub fn Rodne_cislo() -> Element {
                         input {
                             r#type: "text",
                             placeholder: "Např: 980215423",
-                            class: {if has_error 
-                            {"input input-bordered input-error text-error input-lg w-full font-mono"} 
-                            else 
-                            {"input input-bordered input-primary input-lg w-full font-mono"}},
+                            // Zde by se logikou měnila třída na 'input-error' při špatném zadání
+                            class: {
+                                if has_error {
+                                    "input input-bordered input-error text-error input-lg w-full font-mono"
+                                } else {
+                                    "input input-bordered input-primary input-lg w-full font-mono"
+                                }
+                            },
                             maxlength: "9",
                             oninput: move |evt| {
-                            	input_value.set(evt.value());
+                                input_value.set(evt.value());
                             },
                         }
+                        // error handling
                         if has_error {
                             label { class: "label py-0",
-                                span { class: "label-text-alt text-error",
-                                    "{error_text}"
-                                }
+                                span { class: "label-text-alt text-error", "{error_text}" }
                             }
                         }
                     }
 
+                    // VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ RČ
                     div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
-                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70", "Struktura načteného RČ" }
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70",
+                            "Struktura načteného RČ"
+                        }
                         div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
-                            
+
+                            // Rok
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_rok}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{rc_rok}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Rok" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Rok narození" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Rok narození"
+                                }
                             }
-                            
+
+                            // Měsíc
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_mesic}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{rc_mesic}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Měsíc" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ženy mají +50" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Ženy mají +50"
+                                }
                             }
 
+                            // Den
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_den}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{rc_den}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Den" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Den narození" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Den narození"
+                                }
                             }
 
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "/" }
-                            
-                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_koncovka}" }
-                                div { class: "text-xs mt-2 font-semibold", "Koncovka" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Pořadí v daný den" }
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "/"
                             }
-                            
+
+                            // Koncovka (Pořadové číslo)
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{rc_koncovka}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Koncovka" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Pořadí v daný den"
+                                }
+                            }
+
+                            // Kontrolní číslice
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{rc_control_digit}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{rc_control_digit}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Kontrola" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Ověřovací číslice"
+                                }
                             }
                         }
                     }
                 }
             }
 
-            div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
+            // SPODNÍ ČÁST: POSTUP
 
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
-                    div { class: "mockup-code bg-base-300 text-base-content",
-                        pre { "data-prefix": "&gt;",
-                            code { "Celé 10místné číslo musí být dělitelné 11." }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "V programování používáme operátor % (modulo)." }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "Zbytek po vydělení prvních 9 číslic číslem 11" }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "se stává kontrolní číslicí." }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "Výjimka: Pokud je zbytek 10," }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "kontrolní číslice je 0." }
-                        }
+            // Matematický postup
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
+                div { class: "mockup-code bg-base-300 text-base-content",
+                    pre { "data-prefix": "&gt;",
+                        code { "Celé 10místné číslo musí být dělitelné 11." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "V programování používáme operátor % (modulo)." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "Zbytek po vydělení prvních 9 číslic číslem 11" }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "se stává kontrolní číslicí." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "Výjimka: Pokud je zbytek 10," }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "kontrolní číslice je 0." }
                     }
                 }
             }
@@ -443,42 +675,72 @@ pub fn Rodne_cislo() -> Element {
 
     <div class="page-break"></div>
 
-    <h3>3.4. Soubor: <code>isbn.rs</code></h3>
+    <h3>Soubor: isbn.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Soubor zpracovává formát ISBN. Namísto indexace fixních pozic znaků využívá metodu <code>split('-')</code>, která uživatelský vstup rozdělí podle vložených pomlček do takzvaného vektoru (pole prvků). U každého extrahovaného prvku se kontroluje správný formát (číslice) i přípustná délka pro danou sekci (např. max 5 znaků pro skupinu). Pokud součet délek dává 12 znaků, je zavolán výpočetní algoritmus.
+        <strong>Vysvětlivka:</strong> Soubor zpracovává formát ISBN. Namísto indexace fixních pozic znaků chytře využívá metodu <code>split('-')</code>, která uživatelský vstup rozdělí podle vložených pomlček do vektoru (pole). U každého bloku provádí validaci číselnosti a kontroluje maximální povolenou délku pro danou sekci (např. max 5 znaků pro skupinu). Po dosažení 12 platných číslic zřetězí kód a předá ho algoritmu na Modulo 10.
     </div>
-<pre><code>use dioxus::prelude::*;
+<pre><code>//Postup:
+/*
+1) Vzít prvních 12 čísel ISBN
+2) Střídavě násobit tyto čísla váhami 1 a 3
+3) Sečtení takto vynásobených čísel
+4) Výpočet zbytku po dělení tohoto čísla 10 (modulo)
+5) Tento zbytek odečíst od čísla 10
+*/
+
+//Možná zde zakomponovat pro zajímavost i vydavatele? (čísla 6 až 9)
+
+use dioxus::prelude::*;
 use crate::Route;
+//import algoritmu na výpočet kontrolní číslice
 use crate::algorithms::modulo_10_algorithm;
 
 #[component]
 pub fn Isbn() -> Element {
     let nav = use_navigator();
     
+    // Zadaný vstup od uživatele
     let mut input_value = use_signal(|| String::new());	
+	//Pole do kterých budu vkládat data
     let mut isbn_prefix = String::new();
     let mut isbn_group = String::new();
     let mut isbn_publisher = String::new();
     let mut isbn_publication = String::new();
     let mut isbn_check_digit = String::new();
+    //hodnota která počítá délku isbn bez pomlček
     let mut isbn_length: i32 = 0;
 
 
+	//signály pro error uživatele při vkládání ISBN
     let mut has_error = false;
+    //pro text erroru
     let mut error_text = String::new();
 
+	// ================ LOGIKA ZAZNAMENÁVÁNÍ DAT DO POLÍ ======================
+
+
+	//check jestli je v poli něco
 	if !input_value.is_empty(){
+		//Chheck whether input string is parsable to i32 - e.g whether 
+		// String vstupu od uživatele pro držení hodnoty
 		let input_string = input_value();
+		//pokus o split stringu -&gt; musí tam být pomlky, jinak bych nevěděl co dát do jakého pole
 		let mut fields_vec: Vec&lt;&amp;str&gt; = input_string.split('-').collect();
+		//remove all "" characters, occur when input is 1- the vec is ["", "1"]
 		fields_vec.retain(|&amp;elem| !elem.is_empty());
 
+		//check polí - kolik jich tam je - zkoušel jsem tu match, ale vzhledem k tomu, že potřebuju porovnávat len s několika čísly tak
+		// if se jeví jako lepší možnost
 		if fields_vec.len() &gt;= 1 {		
+				//this triggers if the value cant be parsed to i32 - meaning its not numeric
 				if fields_vec[0].parse::&lt;i32&gt;().is_err(){
 					has_error = true;
 					error_text = "V prefixu ISBN se vyskytuje nečíselný charakter.".to_string();
 				}
 				else{
+					//když není error, zapsat hodnotu
 					isbn_prefix = fields_vec[0].to_string();
+					//Check zda není moc krátké, nebo dlouhé
 					if fields_vec[0].len() != 3 {
 						has_error = true;
 						error_text = "Prefix ISBN musí mít přesně 3 číslice.".to_string();	
@@ -490,15 +752,18 @@ pub fn Isbn() -> Element {
 				}
 		
 		}
-		
+		//není tu else if, protože potřebuji aby se vždy nastavily všechny hodnoty
 		if fields_vec.len() &gt;= 2 {
 				if fields_vec[1].parse::&lt;i32&gt;().is_err(){
 					has_error = true;
 					error_text = "V ISBN skupině se vyskytuje nečíselný charakter.".to_string();
 				}
 				else{
+					//když není error, zapsat hodnotu
 					isbn_group = fields_vec[1].to_string();
+					//add len to len total
 					isbn_length += fields_vec[1].len() as i32;
+					//Check zda není moc krátké, nebo dlouhé
 					if fields_vec[1].len() &gt; 5 {
 						has_error = true;
 						error_text = "ISBN skupina musí mít maximálně 5 číslic.".to_string();	
@@ -506,15 +771,18 @@ pub fn Isbn() -> Element {
 					
 				}	
 		}
-		
+		//není tu else if, protože potřebuji aby se vždy nastavily všechny hodnoty
 		if fields_vec.len() &gt;= 3 {
 				if fields_vec[2].parse::&lt;i32&gt;().is_err(){
 					has_error = true;
 					error_text = "V ISBN vydavateli se vyskytuje nečíselný charakter.".to_string();
 				}
 				else{
+					//když není error, zapsat hodnotu
 					isbn_publisher = fields_vec[2].to_string();
+					//add len to total
 					isbn_length += fields_vec[2].len() as i32;
+					//Check zda není moc krátké, nebo dlouhé
 					if fields_vec[2].len() &gt; 7 {
 						has_error = true;
 						error_text = "ISBN vydavatel musí mít maximálně 7 číslic.".to_string();	
@@ -528,16 +796,21 @@ pub fn Isbn() -> Element {
 					error_text = "ISBN publikaci se vyskytuje nečíselný charakter.".to_string();
 				}
 				else{
+					//když není error, zapsat hodnotu
 					isbn_publication = fields_vec[3].to_string();
+					//add len to total
 					isbn_length	+= fields_vec[3].len() as i32;
+					//Check zda není moc krátké, nebo dlouhé
 					if fields_vec[3].len() &gt; 6 {
 						has_error = true;
 						error_text = "ISBN publikace musí mít maximálně 6 číslic.".to_string();	
 					}
 
+				//check zda je string kompletní a může dojít k kalkulaci kontrolní číslice
 				if isbn_length == 12 {
 					let concat_isbn = isbn_prefix.clone() + &amp;isbn_group + &amp;isbn_publisher + &amp;isbn_publication;
 					isbn_check_digit = modulo_10_algorithm(&amp;concat_isbn);
+					//tracing::info!(result);
 				}
 				else{
 					has_error = true;
@@ -550,6 +823,7 @@ pub fn Isbn() -> Element {
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
 
+            // Horní navigace / Zpět
             button {
                 class: "btn btn-ghost gap-2",
                 onclick: move |_| {
@@ -558,6 +832,7 @@ pub fn Isbn() -> Element {
                 "Zpět na výběr"
             }
 
+            // HLAVNÍ KARTA S FORMULÁŘEM A VIZUALIZACÍ
             div { class: "card bg-base-100 shadow-xl border border-base-300",
                 div { class: "card-body",
                     h2 { class: "card-title text-2xl mb-4", "Analýza ISBN-13 kódu" }
@@ -568,94 +843,133 @@ pub fn Isbn() -> Element {
                                 "Vložte prvních 12 čísel kódu ISBN (ISBN-13). Vkládejte prosím s pomlčkami."
                             }
                         }
+                        //error handling v tomto inputu je velmi hloupý ale snad v
                         input {
                             r#type: "text",
                             placeholder: "Např: 978802000987",
-                            class: {if has_error 
-                            {"input input-bordered input-error text-error input-lg w-full font-mono"} 
-                            else 
-                            {"input input-bordered input-primary input-lg w-full font-mono"}},
-                            maxlength: "15",
+                            //Přepínání vzhledu input fieldu pokud je error
+                            class: {
+                                if has_error {
+                                    "input input-bordered input-error text-error input-lg w-full font-mono"
+                                } else {
+                                    "input input-bordered input-primary input-lg w-full font-mono"
+                                }
+                            },
+                            maxlength: "15", // 17 to account for the - symbols, but formatted cant be more than 12/13 (without the control digit 12, with its 13)
+                            //value: "{input_value}",
                             oninput: move |evt| {
-                                input_value.set(evt.value());  
+                                input_value.set(evt.value());
                             },
                         }
+                        //popis případného erroru
                         if has_error {
                             label { class: "label py-0",
-                                span { class: "label-text-alt text-error",
-                                    "{error_text}"
+                                span { class: "label-text-alt text-error", "{error_text}" }
+                            }
+                        }
+                    }
+
+                    // VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ ISBN
+                    div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70",
+                            "Struktura načteného ISBN"
+                        }
+                        div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
+
+                            // Prefix
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_prefix}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Prefix" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "EAN produktový kód"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            // Registrační skupina
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_group}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Skupina" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Země / Jazyk"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            // Vydavatel
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_publisher}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Vydavatel" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Identifikátor vydavatele"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            // Publikace
+                            div { class: "flex flex-col items-center min-w-[6rem] md:min-w-[7rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_publication}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Publikace" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Konkrétní kniha"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            // Kontrolní číslice
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_check_digit}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Kontrola" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Ověřovací číslice"
                                 }
                             }
                         }
                     }
-
-                    div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
-                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70", "Struktura načteného ISBN" }
-                        div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
-                            
-                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_prefix}" }
-                                div { class: "text-xs mt-2 font-semibold", "Prefix" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "EAN produktový kód" }
-                            }
-                            
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
-                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_group}" }
-                                div { class: "text-xs mt-2 font-semibold", "Skupina" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Země / Jazyk" }
-                            }
-
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
-                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publisher}" }
-                                div { class: "text-xs mt-2 font-semibold", "Vydavatel" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Identifikátor vydavatele" }
-                            }
-
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
-                            div { class: "flex flex-col items-center min-w-[6rem] md:min-w-[7rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publication}" }
-                                div { class: "text-xs mt-2 font-semibold", "Publikace" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Konkrétní kniha" }
-                            }
-
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
-                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_check_digit}" }
-                                div { class: "text-xs mt-2 font-semibold", "Kontrola" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
-                            }
-                        }
-                    }
                 }
             }
 
-            div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
-
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
-                    div { class: "mockup-code bg-base-300 text-base-content",
-                        pre { "data-prefix": "&gt;",
-                            code { "ISBN-13 používá Modulo 10." }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "Násobení vahou 1 a 3 na střídačku:" }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "x₁*1 + x₂*3 + x₃*1 + x₄*3 ..." }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "10 - (Součet % 10) = Kontrolní číslice" }
-                        }
+            // Matematický postup
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
+                div { class: "mockup-code bg-base-300 text-base-content",
+                    pre { "data-prefix": "&gt;",
+                        code { "ISBN-13 používá Modulo 10." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "Násobení vahou 1 a 3 na střídačku:" }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "x₁*1 + x₂*3 + x₃*1 + x₄*3 ..." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "10 - (Součet % 10) = Kontrolní číslice" }
                     }
                 }
-
             }
+        
         }
     }
 }
@@ -663,13 +977,18 @@ pub fn Isbn() -> Element {
 
     <div class="page-break"></div>
 
-    <h3>3.5. Soubor: <code>ean13.rs</code></h3>
+    <h3>Soubor: ean13.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Pro analýzu formátu EAN-13, který na rozdíl od ISBN neobsahuje oddělovače (pomlčky), využívá soubor metodu přímého indexování pomocí pevných délek řetězce (Země, Výrobce, Produkt). K ověření, že byl zadán číselný formát o délce až 13 znaků, slouží datový typ u64, který má dostatečnou kapacitu pro hodnoty tohoto rozsahu.
+        <strong>Vysvětlivka:</strong> Pro analýzu formátu EAN-13, který na rozdíl od ISBN neobsahuje oddělovače (pomlčky), využívá soubor metodu přímého indexování úseků pomocí <code>get()</code> a pevných délek řetězce (Země, Výrobce, Produkt). K ověření, že byl zadán číselný formát o délce 13 znaků, slouží datový typ u64, který má dostatečnou kapacitu pro hodnoty tohoto rozsahu. Navíc obsahuje SVG renderování čárového kódu přes knihovnu <code>barcoders</code>.
     </div>
-<pre><code>use dioxus::prelude::*;
+<pre><code>//EAN -13
+use dioxus::prelude::*;
 use crate::Route;
+//pro algoritmus výpočtu kontrolní číslice EAN-13
 use crate::algorithms::modulo_10_algorithm;
+//pro čárové kódy
+use barcoders::sym::ean13::EAN13;
+use barcoders::generators::svg::SVG;
 
 #[component]
 pub fn Ean13() -> Element {
@@ -677,6 +996,9 @@ pub fn Ean13() -> Element {
 	let nav = use_navigator();
 
 	let mut input_value = use_signal(|| String::new());
+
+	//pro concat stringů na generování finálního barcode
+	let mut full_ean_string = String::new();
 
 	let mut ean13_gs_prefix = String::new();
 	let mut ean13_vyrobce = String::new();
@@ -686,31 +1008,59 @@ pub fn Ean13() -> Element {
 	let mut has_error = false;
 	let mut error_text = String::new();
 
+	//proměná pro čárový kód
+	let mut barcode_svg = "&lt;p style='color: gray;'&gt;Zde se zobrazí čárový kód po zadání EAN-13...&lt;/p&gt;".to_string();
+
+	//check if its empty
 	if !input_value.is_empty(){
 
 		let input_string = input_value();
 
+		//check whether it is a number -&gt; don't have to do it individually because they are not separated by a comma
+		//have to make it u64 though because its 13 digits
 		if input_string.parse::&lt;u64&gt;().is_err(){
 			has_error = true;
 			error_text = "V EAN-13 se vyskytují nečíselné znaky.".to_string();
 		}
 
 		if input_string.len() &gt;= 3 &amp;&amp; !has_error{
+			//attempt to parse
 			if let Some(val) = input_string.get(0..3){
 				ean13_gs_prefix = val.to_string();
 			}
 		}
 
 		if input_string.len() &gt;= 7 &amp;&amp; !has_error{
+			//attempt to parse
 			if let Some(val) = input_string.get(3..7){
 				ean13_vyrobce = val.to_string();
 			}
 		}
 		if input_string.len() &gt;= 12 &amp;&amp; !has_error{
+			//attempt to parse
 			if let Some(val) = input_string.get(7..12){
 				ean13_produkt = val.to_string();
 			}
+			//calculate control digit
+			//dont even have to check anything yahoo
 			ean13_control_digit = modulo_10_algorithm(&amp;input_string);
+			//zformátování stringů dohromady
+			full_ean_string = format!("{}{}", input_string, ean13_control_digit);
+			//Vygenerování čárového kódu a dosazení na místo
+			barcode_svg = match EAN13::new(&amp;full_ean_string){
+				Ok(ean) =&gt;
+				{
+					let encoded = ean.encode();
+					match SVG::new(40).generate(&amp;encoded){
+						Ok(res) =&gt; res,
+						Err(_) =&gt; "&lt;p style='color: red;'&gt;Generování selhalo.&lt;/p&gt;".to_string()
+					}
+				}
+				Err(_) =&gt; 
+				{
+					"&lt;p style='color: red;'&gt;Generování selhalo.&lt;/p&gt;".to_string()
+				}
+			};
 		}
 
 	}
@@ -718,138 +1068,186 @@ pub fn Ean13() -> Element {
 	
 
 	rsx! {
-	    div { class: "p-6 max-w-5xl mx-auto space-y-8",
-	
-	        button {
-	            class: "btn btn-ghost gap-2",
-	            onclick: move |_| {
-	            	nav.push(Route::Home {});
-	            },
-	            "Zpět na výběr"
-	        }
-	
-	        div { class: "card bg-base-100 shadow-xl border border-base-300",
-	            div { class: "card-body",
-	                h2 { class: "card-title text-2xl mb-4", "Analýza EAN-13 kódu" }
-	
-	                div { class: "form-control w-full",
-	                    label { class: "label",
-	                        span { class: "label-text font-semibold",
-	                            "Vložte prvních 12 čísel kódu EAN-13."
-	                        }
-	                    }
-	                    input {
-	                        r#type: "text",
-	                        placeholder: "Např: 859123456789",
-                            class: {if has_error 
-                            {"input input-bordered input-error text-error input-lg w-full font-mono"} 
-                            else 
-                            {"input input-bordered input-primary input-lg w-full font-mono"}},
-                            oninput: move |evt| {
-                            	input_value.set(evt.value());
+        div { class: "p-6 max-w-5xl mx-auto space-y-8",
+
+            // Horní navigace / Zpět
+            button {
+                class: "btn btn-ghost gap-2",
+                onclick: move |_| {
+                    nav.push(Route::Home {});
+                },
+                "Zpět na výběr"
+            }
+
+            // HLAVNÍ KARTA S FORMULÁŘEM A VIZUALIZACÍ
+            div { class: "card bg-base-100 shadow-xl border border-base-300",
+                div { class: "card-body",
+                    h2 { class: "card-title text-2xl mb-4", "Analýza EAN-13 kódu" }
+
+                    div { class: "form-control w-full",
+                        label { class: "label",
+                            span { class: "label-text font-semibold",
+                                "Vložte prvních 12 čísel kódu EAN-13."
+                            }
+                        }
+                        input {
+                            r#type: "text",
+                            placeholder: "Např: 859123456789",
+                            class: {
+                                if has_error {
+                                    "input input-bordered input-error text-error input-lg w-full font-mono"
+                                } else {
+                                    "input input-bordered input-primary input-lg w-full font-mono"
+                                }
                             },
-	                        maxlength: "12",
-	                    }
+                            oninput: move |evt| {
+                                input_value.set(evt.value());
+                            },
+                            maxlength: "12",
+                        }
+                        // Zástupný prvek pro chybovou hlášku
                         if has_error {
                             label { class: "label py-0",
-                                span { class: "label-text-alt text-error",
-                                    "{error_text}"
+                                span { class: "label-text-alt text-error", "{error_text}" }
+                            }
+                        }
+                    }
+
+                    // VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ EAN
+                    div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70",
+                            "Struktura načteného EAN"
+                        }
+                        div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
+
+                            // GS1 prefi
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{ean13_gs_prefix}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "GS1 Prefix" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Země (např. ČR)"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            // císlo výrobce
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[7rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{ean13_vyrobce}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Výrobce" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Registrační číslo firmy"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            // Císlo položky
+                            div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[7rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{ean13_produkt}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Produkt" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Identifikace zboží"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            //kontrol cislice
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{ean13_control_digit}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Kontrola" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Ověřovací číslice"
                                 }
                             }
                         }
-	                }
-	
-	                div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
-	                    h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70", "Struktura načteného EAN" }
-	                    div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
-	                        
-	                        div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
-	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ean13_gs_prefix}" }
-	                            div { class: "text-xs mt-2 font-semibold", "GS1 Prefix" }
-	                            div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Země (např. ČR)" }
-	                        }
-	                        
-	                        div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-	                        
-	                        div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[7rem]",
-	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ean13_vyrobce}" }
-	                            div { class: "text-xs mt-2 font-semibold", "Výrobce" }
-	                            div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Registrační číslo firmy" }
-	                        }
-	
-	                        div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-	                        
-	                        div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[7rem]",
-	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ean13_produkt}" }
-	                            div { class: "text-xs mt-2 font-semibold", "Produkt" }
-	                            div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Identifikace zboží" }
-	                        }
-	
-	                        div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-	                        
-	                        div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-	                            div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ean13_control_digit}" }
-	                            div { class: "text-xs mt-2 font-semibold", "Kontrola" }
-	                            div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
-	                        }
-	                    }
-	                }
-	            }
-	        }
-	
-	        div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
-	
-	            div { class: "space-y-4",
-	                h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
-	                div { class: "mockup-code bg-base-300 text-base-content",
-	                    pre { "data-prefix": "&gt;",
-	                        code { "EAN-13 používá Modulo 10 (stejně jako ISBN-13)." }
-	                    }
-	                    pre { "data-prefix": "&gt;",
-	                        code { "Násobení vahou 1 a 3 zleva doprava:" }
-	                    }
-	                    pre { "data-prefix": "&gt;",
-	                        code { "x₁*1 + x₂*3 + x₃*1 + x₄*3 ..." }
-	                    }
-	                    pre { "data-prefix": "&gt;",
-	                        code { "10 - (Součet % 10) = Kontrolní číslice" }
-	                    }
-	                }
-	            }
-	        }
-	    }
-	}
+                    }
+                }
+            }
+
+            div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
+                //matematický psotup
+                div { class: "space-y-4",
+                    h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
+                    div { class: "mockup-code bg-base-300 text-base-content min-h-[220px]",
+                        pre { "data-prefix": "&gt;",
+                            code { "EAN-13 používá Modulo 10 (stejně jako ISBN-13)." }
+                        }
+                        pre { "data-prefix": "&gt;",
+                            code { "Násobení vahou 1 a 3 zleva doprava:" }
+                        }
+                        pre { "data-prefix": "&gt;",
+                            code { "x₁*1 + x₂*3 + x₃*1 + x₄*3 ..." }
+                        }
+                        pre { "data-prefix": "&gt;",
+                            code { "10 - (Součet % 10) = Kontrolní číslice" }
+                        }
+                    }
+                }
+                //místo pro čárový kód
+                div { class: "space-y-4",
+                    h3 { class: "text-xl font-bold", "Čárový kód" }
+                    div {
+                        class: "w-full p-6 bg-white rounded-box border border-base-300 flex justify-center items-center overflow-hidden min-h-[220px]",
+                        dangerous_inner_html: "{barcode_svg}",
+                    }
+                }
+            }
+        }
+    }
 }
 </code></pre>
 
     <div class="page-break"></div>
 
-    <h3>3.6. Soubor: <code>iban_page.rs</code></h3>
+    <h3>Soubor: iban_page.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Zpracování IBAN kódů je realizováno ve dvou oddělených krocích s využitím externí knihovny <code>iban</code>. Nejprve se program pokouší verifikovat uživatelský řetězec jako kompletní a platný kód IBAN. V případě chyby aplikace provádí odhad, zda nebyl vynechán blok s kontrolními číslicemi. Pokud má vstup dostatečnou délku, algoritmus na vyhrazené pozice dosadí dočasně nuly (např. CZ00) a následně vypočítá validní kontrolní součet metodou Modulo 97.
+        <strong>Vysvětlivka:</strong> Zpracování IBAN kódů je realizováno za využití externí knihovny <code>iban</code>, jelikož specifikace mezinárodních bankovních formátů je poměrně komplexní. Program se nejdřív snaží parsovat zadaný řetězec jako platný IBAN. Pokud se to nepovede (uživatel např. zapomněl kontrolní číslici), aplikace uměle dosadí „00“ na místo kontrolních číslic a pomocí modulo 97 sama provede kontrolní součet a dopočítá chybějící dvojčíslí.
     </div>
 <pre><code>use crate::Route;
 use dioxus::prelude::*;
+//knihovna na IBAN, protože je to poměrně složité
 use iban::{Bban, Iban};
 
 
 #[component]
-pub fn Iban_page() -> Element {
+pub fn Iban_page() -&gt; Element {
     let nav = use_navigator();
 
+    // Vstup do input field
     let mut input_value = use_signal(|| String::new());
 
+    // will hold the iban not formatted value
     let mut input_string = String::new();
 
+    // Proměnné pro zobrazení
     let mut iban_country_code = String::new();
     let mut iban_check_digit = String::new();
     let mut iban_bank_code = String::new();
     let mut iban_account_number = String::new();
 
+    // Error handling
     let mut has_error = false;
     let mut error_text = String::new();
+    //pro uspech
     let mut has_sucess = false;
     let mut sucess_text = String::new();
+    //pro informace
     let mut has_info = false;
     let mut info_text = String::new();
 
@@ -857,7 +1255,14 @@ pub fn Iban_page() -> Element {
         input_string = input_value();
     }
 
+    //Zcela nová a radikálně jednodušší logika oproti starší verzi
+    //Pokaždé, když se zadá další číslice iban, pokusim se to parsenout jako iban
+    //pokud to selže, pokusím se tam dopočítat kontrolni číslici a opět to parsenout
+    //jako iban, pokud selže i to, nejedná se o validní iban
+
     if let Ok(val) = input_string.parse::&lt;Iban&gt;() {
+        //pokud toto vyjde jedná se o validní iban, tutíž stačí assignout hodnoty
+        //protože uživatel do pole z nějakého důvodu zadal kompletní iban
         iban_country_code = val.country_code().to_string();
         iban_check_digit = val.check_digits().to_string();
 
@@ -867,18 +1272,25 @@ pub fn Iban_page() -> Element {
 
         let bban: Bban = val.bban();
 
+        //try to parse bank account number
         if let Some(bban_bank) = bban.bank_identifier(){
         	iban_bank_code = bban_bank.to_string();
         }
+        //pokud se nepodařilo parsenout bank account number, hodím do čísla účtu celý bban
+		//teď mám, nebo nemám kód banky (ale spíš jo), takže slicenu celkový bban
 		let iban_bank_len: usize = iban_bank_code.len().try_into().unwrap();
 		iban_account_number = bban.as_str()[iban_bank_len..].to_string();
 
     }
+    //pokud se nepodaří parsenout iban
     else {
+        //remove all empty spaces
         let mut original_iban = input_string.clone();
         original_iban.retain(|c| !c.is_whitespace());
 
+        //kontrola délky, protože provádím slicing a nejkratší možný valid iban je 15
         if original_iban.len() &gt;= 15 {
+            //zkontrolovat, zda pouze uživatel nedodal iban kód bez kontrolní číslice
             let nulovany_iban = format!("{}00{}", &amp;original_iban[..2], &amp;original_iban[2..]);
 
             let check_digits = 98 - iban::calculate_checksum(nulovany_iban.as_bytes());
@@ -889,7 +1301,11 @@ pub fn Iban_page() -> Element {
                 check_digits,
                 &amp;original_iban[2..]
             );
+            //zde provést kontrolu jestli je to validní iban
+            //jedná se zde o stejný if let jako je nahoře
             if let Ok(val) = calculated_iban.parse::&lt;Iban&gt;() {
+                //pokud toto vyjde jedná se o validní iban, tutíž stačí assignout hodnoty
+                //protože uživatel do pole z nějakého důvodu zadal kompletní iban
                 iban_country_code = val.country_code().to_string();
                 iban_check_digit = val.check_digits().to_string();
 
@@ -901,9 +1317,12 @@ pub fn Iban_page() -> Element {
 
 		        let bban: Bban = val.bban();
 
+		        //try to parse bank account number
 		        if let Some(bban_bank) = bban.bank_identifier(){
 		        	iban_bank_code = bban_bank.to_string();
 		        }
+		        //pokud se nepodařilo parsenout bank account number, hodím do čísla účtu celý bban
+				//teď mám, nebo nemám kód banky (ale spíš jo), takže slicenu celkový bban
 				let iban_bank_len: usize = iban_bank_code.len().try_into().unwrap();
 				iban_account_number = bban.as_str()[iban_bank_len..].to_string();
             }
@@ -917,6 +1336,7 @@ pub fn Iban_page() -> Element {
     rsx! {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
 
+            // Horní navigace / Zpět
             button {
                 class: "btn btn-ghost gap-2",
                 onclick: move |_| {
@@ -925,6 +1345,7 @@ pub fn Iban_page() -> Element {
                 "Zpět na výběr"
             }
 
+            // HLAVNÍ KARTA S FORMULÁŘEM A VIZUALIZACÍ
             div { class: "card bg-base-100 shadow-xl border border-base-300",
                 div { class: "card-body",
                     h2 { class: "card-title text-2xl mb-4", "Analýza IBAN kódu" }
@@ -938,100 +1359,134 @@ pub fn Iban_page() -> Element {
                         input {
                             r#type: "text",
                             placeholder: "Např: CZ69 0710 1781 2400 0000 4159",
-                            class: {if has_error
-                            {"input input-bordered input-error text-error input-lg w-full font-mono"}
-							else if has_sucess
-							{"input input-bordered input-success text-success input-lg w-full font-mono"}
-							else if has_info
-							{"input input-bordered input-info text-info input-lg w-full font-mono"}
-                            else
-                            {"input input-bordered input-primary input-lg w-full font-mono"}},
-                            maxlength: "34",
+                            // Přepínání tříd při chybě
+                            class: {
+                                if has_error {
+                                    "input input-bordered input-error text-error input-lg w-full font-mono"
+                                } else if has_sucess {
+                                    "input input-bordered input-success text-success input-lg w-full font-mono"
+                                } else if has_info {
+                                    "input input-bordered input-info text-info input-lg w-full font-mono"
+                                } else {
+                                    "input input-bordered input-primary input-lg w-full font-mono"
+                                }
+                            },
+                            maxlength: "34", // Maximální teoretická délka IBAN
                             oninput: move |evt| {
                                 input_value.set(evt.value());
                             },
                         }
+                        // Zobrazení chyby
                         if has_error {
                             label { class: "label py-0",
-                                span { class: "label-text-alt text-error",
-                                    "{error_text}"
-                                }
+                                span { class: "label-text-alt text-error", "{error_text}" }
                             }
                         }
                         if has_sucess {
                             label { class: "label py-0",
-                                span { class: "label-text-alt text-success",
-                                    "{sucess_text}"
-                                }
+                                span { class: "label-text-alt text-success", "{sucess_text}" }
                             }
                         }
                         if has_info {
                             label { class: "label py-0",
-                                span { class: "label-text-alt text-info",
-                                    "{info_text}"
-                                }
+                                span { class: "label-text-alt text-info", "{info_text}" }
                             }
                         }
                     }
 
+                    // VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ IBAN
                     div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
-                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70", "Struktura načteného IBAN" }
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70",
+                            "Struktura načteného IBAN"
+                        }
 
                         div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
 
+                            // Kód země
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{iban_country_code}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{iban_country_code}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Země" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Kód státu" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Kód státu"
+                                }
                             }
 
+                            // Kontrolní číslice (Zvýrazněna jako error barvou pro kontrolní mechanismy)
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{iban_check_digit}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{iban_check_digit}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Kontrola" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Ověřovací číslice"
+                                }
                             }
 
+                            // Kód banky (BBAN část 1)
                             div { class: "flex flex-col items-center min-w-[6rem] md:min-w-[7rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{iban_bank_code}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{iban_bank_code}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Banka" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Kód instituce" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Kód instituce"
+                                }
                             }
 
+                            // Číslo účtu (BBAN část 2) - má širší kontejner, protože bývá dlouhé
                             div { class: "flex flex-col items-center min-w-[12rem] md:min-w-[16rem] max-w-full",
-                                div { class: "text-lg md:text-2xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm overflow-hidden", "{iban_account_number}" }
+                                div { class: "text-lg md:text-2xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm overflow-hidden",
+                                    "{iban_account_number}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Číslo účtu" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Předčíslí a základní číslo" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Předčíslí a základní číslo"
+                                }
                             }
                         }
                     }
                 }
             }
 
-            div { class: "grid grid-cols-1 gap-8",
+            // SPODNÍ ČÁST: POSTUP
 
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Výpočet kontrolní číslice IBAN" }
-                    div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
-                        pre { "data-prefix": "&gt;",
-                            code { "1. Sestaví se základní řetězec: Kód banky + Číslo účtu (tzv. BBAN)." }
+            // Matematický postup
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Výpočet kontrolní číslice IBAN" }
+                div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
+                    pre { "data-prefix": "&gt;",
+                        code {
+                            "1. Sestaví se základní řetězec: Kód banky + Číslo účtu (tzv. BBAN)."
                         }
-                        pre { "data-prefix": "&gt;",
-                            code { "2. Na konec tohoto řetězce se připojí kód země a dvě nuly (např. 'CZ00')." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code {
+                            "2. Na konec tohoto řetězce se připojí kód země a dvě nuly (např. 'CZ00')."
                         }
-                        pre { "data-prefix": "&gt;",
-                            code { "3. Všechna písmena v řetězci se převedou na čísla (A=10, B=11 ... Z=35)." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code {
+                            "3. Všechna písmena v řetězci se převedou na čísla (A=10, B=11 ... Z=35)."
                         }
-                        pre { "data-prefix": "&gt;",
-                            code { "4. Vzniklé číslo se vydělí 97 a zjistí se zbytek (operace modulo)." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "4. Vzniklé číslo se vydělí 97 a zjistí se zbytek (operace modulo)." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code {
+                            "5. Tento zbytek se následně odečte od čísla 98 (Výpočet: 98 - zbytek)."
                         }
-                        pre { "data-prefix": "&gt;",
-                            code { "5. Tento zbytek se následně odečte od čísla 98 (Výpočet: 98 - zbytek)." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code {
+                            "6. Pokud je výsledek jednociferný, přidá se před něj nula (např. 7 -&gt; 07)."
                         }
-                        pre { "data-prefix": "&gt;",
-                            code { "6. Pokud je výsledek jednociferný, přidá se před něj nula (např. 7 -&gt; 07)." }
-                        }
-                        pre { "data-prefix": "&gt;",
-                            code { "7. Toto dvojčíslí se pak vloží hned za kód země a tím vznikne finální IBAN." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code {
+                            "7. Toto dvojčíslí se pak vloží hned za kód země a tím vznikne finální IBAN."
                         }
                     }
                 }
@@ -1040,5 +1495,392 @@ pub fn Iban_page() -> Element {
     }
 }
 </code></pre>
+
+    <div class="page-break"></div>
+
+    <h3>Soubor: ico.rs</h3>
+    <div class="explanation">
+        <strong>Vysvětlivka:</strong> Tato komponenta slouží k analýze Identifikačního čísla osoby (IČO). Přijímá vstup 7 nebo 8 znaků. Pokud uživatel zadá 7 znaků, program doplní a vypočítá 8. kontrolní číslici a zobrazí informativní zprávu. Pokud uživatel zadá 8 znaků, rozdělí řetězec, provede výpočet kontrolní číslice na základě prvních sedmi znaků a porovná jej s posledním zadaným znakem pro kompletní validaci formátu.
+    </div>
+<pre><code>use dioxus::prelude::*;
+use crate::Route;
+
+use crate::algorithms::ico_control_digit;
+
+
+#[component]
+pub fn Ico() -&gt; Element {
+    let nav = use_navigator();
+
+    let mut input_value = use_signal(|| String::new());
+    let mut input_string = String::new();
+
+    let mut has_error = false;
+    let mut error_text = String::new();
+
+    let mut has_success = false;
+    let mut sucess_text = String::new();
+
+    let mut has_info = false;
+    let mut info_text = String::new();
+    
+    let mut ico_base = String::new();
+	let mut ico_cont_digit = String::new();
+
+	
+	if input_value.len() &gt; 0 {
+		input_string = input_value();
+		//kontrola numericity
+		if input_string.parse::&lt;u32&gt;().is_err(){
+			has_error = true;
+			error_text = "V poli se vyskytují nenumerické znaky.".to_string();
+		}
+		//check jestli uživatel zadal celé ičo
+		if input_string.len() == 8 &amp;&amp; !has_error{
+			//vzatí prvních 7 znaků a passnutí na kalkulaci
+			if let Some(val) = input_string.get(0..7){
+				let control_digit = ico_control_digit(val);
+				ico_base = val.to_string();
+				//kontrola zda se rovná kontrolní číslice s zadanou kontrolní číslicí
+				if let Some(val) = input_string.get(7..8){
+					if val == control_digit{
+						has_success = true;
+						sucess_text = "Zadali jste validní IČO.".to_string();
+						ico_cont_digit = control_digit;
+					}
+					else{
+						has_error = true;
+						error_text = "Zadali jste IČO se špatnou kontrolní číslicí.".to_string();
+						ico_cont_digit = control_digit;
+					}
+				}
+				
+			}
+			else{
+				has_error = true;
+				error_text = "Selhalo parsování".to_string();
+			}
+		}	
+		//check jestli uživatel zadal ičo s kontrolní číslicí
+		if input_string.len() == 7 &amp;&amp; !has_error{
+			//vzatí prvních 7 znaků a passnutí na kalkulaci
+			if let Some(val) = input_string.get(0..7){
+				ico_base = val.to_string();
+				let control_digit = ico_control_digit(val);
+				ico_cont_digit = control_digit;
+				has_info = true;
+				info_text = "Zadali jste validní IČO bez kontrolní číslice, která byla vypočtena.".to_string();
+				
+			}
+			else{
+				has_error = true;
+				error_text = "Selhalo parsování".to_string();
+			}
+		}
+	}
+    
+
+    rsx! {
+        div { class: "p-6 max-w-5xl mx-auto space-y-8",
+            button {
+                class: "btn btn-ghost gap-2",
+                onclick: move |_| {
+                    nav.push(Route::Home {});
+                },
+                "Zpět na výběr"
+            }
+
+            div { class: "card bg-base-100 shadow-xl border border-base-300",
+                div { class: "card-body",
+                    h2 { class: "card-title text-2xl mb-4", "Analýza IČO" }
+
+                    div { class: "form-control w-full",
+                        label { class: "label",
+                            span { class: "label-text font-semibold", "Vložte IČO." }
+                        }
+                        input {
+                            r#type: "text",
+                            placeholder: "Např: 25596641",
+                            class: {
+                                if has_error {
+                                    "input input-bordered input-error text-error input-lg w-full font-mono"
+                                } else if has_success {
+                                    "input input-bordered input-success text-success input-lg w-full font-mono"
+                                } else if has_info {
+                                    "input input-bordered input-info text-info input-lg w-full font-mono"
+                                } else {
+                                    "input input-bordered input-primary input-lg w-full font-mono"
+                                }
+                            },
+                            oninput: move |evt| {
+                                input_value.set(evt.value());
+                            },
+                            maxlength: "8",
+                        }
+                        if has_error {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-error", "{error_text}" }
+                            }
+                        }
+                        if has_success {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-success", "{sucess_text}" }
+                            }
+                        }
+                        if has_info {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-info", "{info_text}" }
+                            }
+                        }
+                    
+                    }
+
+                    div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70",
+                            "Struktura načteného IČO"
+                        }
+                        div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
+
+                            div { class: "flex flex-col items-center min-w-[8rem] md:min-w-[10rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{ico_base}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Základní číslo" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Pořadové identifikační číslo"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{ico_cont_digit}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Kontrola" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Ověřovací číslice"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
+                div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
+                    pre { "data-prefix": "&gt;",
+                        code { "1. Prvních 7 číslic se násobí váhami 8, 7, 6, 5, 4, 3, 2." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "2. Vypočítá se součet těchto násobků." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "3. Zbytek = Součet % 11." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "4. K = 11 - Zbytek (se speciálními pravidly pro 0, 10, 1)." }
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre>
+
+    <div class="page-break"></div>
+
+    <h3>Soubor: luhn.rs</h3>
+    <div class="explanation">
+        <strong>Vysvětlivka:</strong> Aplikace Luhnova algoritmu se používá k ověření platebních karet. Komponenta ověřuje numerický formát zadaného řetězce o délce 15 (dopočet kontrolní číslice) nebo 16 znaků (validace existujícího čísla). Pro přesné zjištění počtu znaků z důvodů případného formátování je korektně využíváno <code>chars().count()</code> namísto pouhého zjišťování bajtové délky.
+    </div>
+<pre><code>use dioxus::prelude::*;
+use crate::Route;
+
+use crate::algorithms::luhn_algo;
+
+#[component]
+pub fn KreditniKarta() -&gt; Element {
+    let nav = use_navigator();
+    let mut input_value = use_signal(|| String::new());
+
+    let mut input_string = String::new();
+    
+    let mut has_error = false;
+    let mut error_text = String::new();
+
+    let mut has_success = false;
+    let mut success_text = String::new();
+
+    let mut has_info = false;
+    let mut info_text = String::new();
+    
+    let mut card_main_part = String::new();
+    let mut card_control_digit = String::new();
+
+    if input_value.len() &gt; 0 {
+    	input_string = input_value();
+
+    	if input_string.parse::&lt;u64&gt;().is_err(){
+    		has_error = true;
+    		error_text = "V čísle karty se vyskytují nečíselné znaky.".to_string();
+    	}
+
+    	//lepší než len() -&gt; len počitá bajty ne počet znaků
+    	if input_string.chars().count() == 15 &amp;&amp; !has_error{
+    		//je třeba dopočíst kontrolní číslici
+    		card_main_part = input_string.clone();
+    		card_control_digit = luhn_algo(&amp;input_string);
+    		has_info = true;
+    		info_text = "Vložili jste číslo karty bez kontrolní číslice a ta vám byla dopočtena.".to_string();
+    	}
+    	if input_string.chars().count() == 16 &amp;&amp; !has_error{
+    		//je třeba validovat kontrolní číslici
+    		//bohužel .get() operuje na bázi bajtů, ne počtu znaků, naštestí se tam nemůže vyskytovat nic jiného jak čísla
+    		if let Some(val) = input_string.get(0..15){
+    			card_main_part = val.to_string();
+    			let luhn_res = luhn_algo(val);
+    			//kontrola zda se rovná vypočítaná číslice té zadané
+    			if let Some(cd) = input_string.get(15..16){
+    				if luhn_res == cd{
+    					has_success = true;
+    					success_text = "Zadali jste číslo karty se správnou kontrolní číslicí.".to_string();
+    					card_control_digit = luhn_res;
+    				}
+    				else{
+    					has_error = true;
+    					error_text = "Zadali jste číslo karty s nesprávnou kontrolní číslicí. Správná je zobrazena níže.".to_string();
+    					card_control_digit = luhn_res;
+    				}
+    			}
+    		}
+    	}
+    }
+
+    rsx! {
+        div { class: "p-6 max-w-5xl mx-auto space-y-8",
+            button {
+                class: "btn btn-ghost gap-2",
+                onclick: move |_| {
+                    nav.push(Route::Home {});
+                },
+                "Zpět na výběr"
+            }
+
+            div { class: "card bg-base-100 shadow-xl border border-base-300",
+                div { class: "card-body",
+                    h2 { class: "card-title text-2xl mb-4",
+                        "Analýza platební karty (Luhnův algoritmus)"
+                    }
+
+                    div { class: "form-control w-full",
+                        label { class: "label",
+                            span { class: "label-text font-semibold",
+                                "Vložte číslo platební karty bez mezer. (podporovány pouze 15/16 místná čísla)"
+                            }
+                        }
+                        input {
+                            r#type: "text",
+                            placeholder: "Např: 453201234567890",
+                            class: {
+                                if has_error {
+                                    "input input-bordered input-error text-error input-lg w-full font-mono"
+                                } else if has_success {
+                                    "input input-bordered input-success text-success input-lg w-full font-mono"
+                                } else if has_info {
+                                    "input input-bordered input-info text-info input-lg w-full font-mono"
+                                } else {
+                                    "input input-bordered input-primary input-lg w-full font-mono"
+                                }
+                            },
+                            oninput: move |evt| {
+                                input_value.set(evt.value());
+                            },
+                            maxlength: "16",
+                        }
+                        if has_error {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-error", "{error_text}" }
+                            }
+                        }
+                        if has_success {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-success", "{success_text}" }
+                            }
+                        }
+                        if has_info {
+                            label { class: "label py-0",
+                                span { class: "label-text-alt text-info", "{info_text}" }
+                            }
+                        }
+                    
+                    }
+
+                    div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70",
+                            "Struktura načtené karty"
+                        }
+                        div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
+
+                            div { class: "flex flex-col items-center min-w-[16rem] md:min-w-[20rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{card_main_part}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Číslo karty" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Základní číslo (bez kontrolní číslice)"
+                                }
+                            }
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
+                            div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{card_control_digit}"
+                                }
+                                div { class: "text-xs mt-2 font-semibold", "Kontrola" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Luhnův výpočet"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Postup výpočtu kontrolní číslice (Luhn)" }
+                div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
+                    pre { "data-prefix": "&gt;",
+                        code { "1. Postupuje se zprava doleva (od předposlední číslice)." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "2. Každá druhá číslice se vynásobí dvěma." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "3. Pokud je výsledek &gt; 9, sečtou se jeho cifry (nebo se odečte 9)." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code { "4. Všechny číslice se sečtou." }
+                    }
+                    pre { "data-prefix": "&gt;",
+                        code {
+                            "5. Kontrolní číslici získáme dosazením součtu do vzorce: (10 - (součet % 10)) % 10"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre>
+
+</div>
+
 </body>
 </html>
