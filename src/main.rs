@@ -1,11 +1,11 @@
+//to stop non snakecase warnings
+#![allow(non_snake_case)]
 use dioxus::prelude::*;
 //for algos
 mod algorithms;
 //for rodne cislo ui and functionality
 mod rodne_cislo;
 use rodne_cislo::Rodne_cislo;
-//for logging - remove later when app complete
-use tracing;
 //for isbn UI and functionality
 mod isbn;
 use isbn::Isbn;

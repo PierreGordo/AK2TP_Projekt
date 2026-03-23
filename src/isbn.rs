@@ -133,7 +133,7 @@ pub fn Isbn() -> Element {
 				}
 				else{
 					has_error = true;
-					error_text = ("Číslo ISBN-13 bez kontrolní číslice musí mít přesně 12 čísel, máte zaznamenaných pouze: ".to_string() + &(isbn_length.to_string()));
+					error_text = "Číslo ISBN-13 bez kontrolní číslice musí mít přesně 12 čísel, máte zaznamenaných pouze: ".to_string() + &(isbn_length.to_string());
 				}
 			}	
 		}
