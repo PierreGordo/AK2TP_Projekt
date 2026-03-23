@@ -30,4 +30,4 @@ Projekt využívá Dioxus 0.7 s automatickou integrací Tailwind CSS.
    ```bash
    curl -sSL [http://dioxus.dev/install.sh](http://dioxus.dev/install.sh) | sh
    ```
-3. Spusťte aplikaci příkazem v kořenu projektu: ```bash dx serve ```. Aplikace poté bude automaticky dostupná v prohlížeči na `http://localhost:8080`
+3. Spusťte aplikaci příkazem v kořenu projektu: `dx serve`. Aplikace poté bude automaticky dostupná v prohlížeči na `http://localhost:8080`
