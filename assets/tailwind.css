@@ -30,6 +30,9 @@
     --font-weight-bold: 700;
     --tracking-widest: 0.1em;
     --leading-tight: 1.25;
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
   }
@@ -858,6 +861,12 @@
   .min-w-\[6rem\] {
     min-width: 6rem;
   }
+  .min-w-\[8rem\] {
+    min-width: 8rem;
+  }
+  .min-w-\[10rem\] {
+    min-width: 10rem;
+  }
   .min-w-\[12rem\] {
     min-width: 12rem;
   }
@@ -1209,6 +1218,21 @@
   .md\:min-w-\[7rem\] {
     @media (width >= 48rem) {
       min-width: 7rem;
+    }
+  }
+  .md\:min-w-\[8rem\] {
+    @media (width >= 48rem) {
+      min-width: 8rem;
+    }
+  }
+  .md\:min-w-\[10rem\] {
+    @media (width >= 48rem) {
+      min-width: 10rem;
+    }
+  }
+  .md\:min-w-\[12rem\] {
+    @media (width >= 48rem) {
+      min-width: 12rem;
     }
   }
   .md\:min-w-\[16rem\] {

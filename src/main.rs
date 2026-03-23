@@ -15,6 +15,17 @@ use ean13::Ean13;
 //for IBAN UI and functionality
 mod iban_page;
 use iban_page::Iban_page;
+//for ICO ui and functionality
+mod ico;
+use ico::Ico;
+//for lohn ui and functionality
+mod luhn;
+use luhn::KreditniKarta;
+//for MRZ ui and functionality
+mod mrz;
+use mrz::MrzPas;
+
+
 
 
 #[derive(Clone, Debug, PartialEq, Routable)]
@@ -33,6 +44,16 @@ pub enum Route {
 
     #[route("/iban")]
     Iban_page,
+
+    #[route("/ico")]
+    Ico,
+
+    #[route("/luhn")]
+    KreditniKarta,
+
+    #[route("/mrz")]
+    MrzPas,
+
 }
 
 const TAILWIND_CSS: Asset = asset!("/assets/tailwind.css");
@@ -107,17 +128,17 @@ fn Home() -> Element {
                         }
                         button {
                             class: "btn btn-outline btn-success btn-lg",
-                            // onclick: move |_| { nav.push(Route::Ico {}); },
+                            onclick: move |_| { nav.push(Route::Ico {}); },
                             "IČO (Identifikační číslo osoby)"
                         }
                         button {
                             class: "btn btn-outline btn-warning btn-lg",
-                            // onclick: move |_| { nav.push(Route::Luhn {}); },
+                            onclick: move |_| { nav.push(Route::KreditniKarta {}); },
                             "Luhnův algoritmus (Karty a IMEI)"
                         }
                         button {
                             class: "btn btn-outline btn-error btn-lg",
-                            // onclick: move |_| { nav.push(Route::Mrz {}); },
+                            onclick: move |_| { nav.push(Route::MrzPas {}); },
                             "MRZ (Strojově čitelná zóna pasů)"
                         }
                     }
