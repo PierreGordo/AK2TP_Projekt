@@ -118,16 +118,12 @@
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
         }
 
-        /* Tiskové styly pro export do PDF */
+        /* Tiskové styly pro plynulý export do PDF bez obřích mezer */
         @media print {
             body { background: white; padding: 0; font-size: 11pt; }
             .container { box-shadow: none; padding: 0; max-width: 100%; border: none; }
-            .page-break { page-break-before: always; }
             
-            /* Zabránění nehezkému lámání v bloku, pokud není moc dlouhý */
             pre { 
-                page-break-inside: auto; 
-                break-inside: avoid;
                 background-color: #f8fafc; 
                 color: #000; 
                 border: 1px solid #cbd5e1; 
@@ -135,14 +131,7 @@
                 word-wrap: break-word; 
                 font-size: 8pt; /* Zmenšení písma kódu pro tisk */
                 box-shadow: none;
-            }
-            h2, h3 { 
-                page-break-after: avoid; 
-                break-after: avoid; 
-            }
-            .explanation { 
-                page-break-inside: avoid; 
-                break-inside: avoid; 
+                /* Povoleno přirozené zalamování stránek uvnitř pre */
             }
         }
     </style>
@@ -161,15 +150,13 @@
 
     <h2>2. Popis funkcí programu</h2>
     <ul>
-        <li><strong>Analýza Rodného čísla:</strong> Program přijímá prvních 9 číslic rodného čísla. Kontroluji, zda vstup obsahuje pouze číselné znaky, a pomocí algoritmu Modulo 11 počítám 10. kontrolní číslici. V případě validního vstupu rozpadne číslo na logické celky (rok, měsíc, den, koncovka).</li>
-        <li><strong>Analýza ISBN-13:</strong> Zde zpracovávám 12místný vstup oddělený pomlčkami. Verifikuji délku jednotlivých částí (prefix, skupina, vydavatel, publikace) a počítám 13. kontrolní číslici pomocí algoritmu Modulo 10 (střídavé násobení vahami 1 a 3).</li>
-        <li><strong>Analýza EAN-13:</strong> Aplikaci jsem navrhl tak, aby parsovala souvislý 12místný číselný řetězec, který dělím na GS1 prefix, kód výrobce a kód produktu. Kontrolní číslici počítám stejným algoritmem (Modulo 10) jako u formátu ISBN. Kód také vizualizuji jako SVG čárový kód pomocí knihovny <code>barcoders</code>.</li>
-        <li><strong>Analýza IBAN:</strong> Primárně se pokouším o validaci celého zadaného kódu IBAN pomocí externí knihovny <code>iban</code>. Pokud uživatel zadá platný kód bez kontrolního dvojčíslí, toto dvojčíslí dopočítávám aplikací algoritmu Modulo 97 (po vložení nul a aplikaci matematického vzorce) a následně zkompletovaný IBAN zvaliduji a rozčlením.</li>
-        <li><strong>Analýza IČO (Identifikační číslo osoby):</strong> Aplikace přijímá vstup o 7 nebo 8 znacích. V případě 7 znaků vypočítám 8. kontrolní číslici pomocí modula 11 s váhami (8, 7, 6, 5, 4, 3, 2). Pokud je vloženo 8 znaků, validuji, zda zadaná kontrolní číslice odpovídá výpočtu.</li>
-        <li><strong>Luhnův algoritmus (Kreditní karty):</strong> Nástroj jsem implementoval pro validaci čísel platebních karet. Pokud je zadáno 15 čísel, program dopočítá 16. kontrolní číslici (postup zprava doleva, násobení každé druhé číslice dvěma, sčítání cifer). Pokud je zadáno 16 čísel, provádím rovnou ověření platnosti.</li>
+        <li><strong>Analýza Rodného čísla:</strong> Program přijímá prvních 9 číslic rodného čísla. Kontroluje, zda vstup obsahuje pouze číselné znaky, a pomocí algoritmu Modulo 11 počítá 10. kontrolní číslici. V případě validního vstupu rozpadne číslo na logické celky (rok, měsíc, den, koncovka).</li>
+        <li><strong>Analýza ISBN-13:</strong> Program zpracovává 12místný vstup oddělený pomlčkami. Verifikuje délku jednotlivých částí (prefix, skupina, vydavatel, publikace) a počítá 13. kontrolní číslici pomocí algoritmu Modulo 10 (střídavé násobení vahami 1 a 3).</li>
+        <li><strong>Analýza EAN-13:</strong> Aplikaci jsem navrhl tak, aby parsovala souvislý 12místný číselný řetězec, který dělí na GS1 prefix, kód výrobce a kód produktu. Kontrolní číslici počítá stejným algoritmem (Modulo 10) jako u formátu ISBN. Kód také vizualizuje jako SVG čárový kód pomocí knihovny <code>barcoders</code>.</li>
+        <li><strong>Analýza IBAN:</strong> Primárně se pokouším o validaci celého zadaného kódu IBAN pomocí externí knihovny <code>iban</code>. Pokud uživatel zadá platný kód bez kontrolního dvojčíslí, toto dvojčíslí dopočítává aplikace pomocí algoritmu Modulo 97 (po vložení nul a aplikaci matematického vzorce) a následně zkompletovaný IBAN zvaliduje a rozčlení.</li>
+        <li><strong>Analýza IČO (Identifikační číslo osoby):</strong> Aplikace přijímá vstup o 7 nebo 8 znacích. V případě 7 znaků vypočítá 8. kontrolní číslici pomocí modula 11 s váhami (8, 7, 6, 5, 4, 3, 2). Pokud je vloženo 8 znaků, validuje, zda zadaná kontrolní číslice odpovídá výpočtu.</li>
+        <li><strong>Luhnův algoritmus (Kreditní karty):</strong> Nástroj jsem implementoval pro validaci čísel platebních karet. Pokud je zadáno 15 čísel, program dopočítá 16. kontrolní číslici (postup zprava doleva, násobení každé druhé číslice dvěma, sčítání cifer). Pokud je zadáno 16 čísel, provádí rovnou ověření platnosti.</li>
     </ul>
-
-    <div class="page-break"></div>
 
     <h2>3. Zdrojový text programu a vysvětlivky</h2>
     <p>
@@ -178,7 +165,7 @@
 
     <h3>Soubor: main.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Tento soubor tvoří vstupní bod mé aplikace. Definuji zde modulární strukturu (nahrání ostatních `.rs` souborů jako modulů), konfiguruji routování (směrování) mezi jednotlivými obrazovkami pomocí výčtového typu <code>Route</code> a inicializuji hlavní rozhraní (komponenta <code>Home</code>). Zde generuji úvodní rozcestník (menu) s tlačítky pro přechod na jednotlivé nástroje.
+        <strong>Vysvětlivka:</strong> Tento soubor tvoří vstupní bod mé aplikace. Definuji zde modulární strukturu (nahrání ostatních .rs souborů jako modulů), konfiguruji routování (směrování) mezi jednotlivými obrazovkami pomocí výčtového typu <code>Route</code> a inicializuji hlavní rozhraní (komponenta <code>Home</code>). Zde generuji úvodní rozcestník (menu) s tlačítky pro přechod na jednotlivé nástroje.
     </div>
 <pre><code>use dioxus::prelude::*;
 //for algos
@@ -322,8 +309,6 @@ fn Home() -> Element {
 }
 </code></pre>
 
-    <div class="page-break"></div>
-
     <h3>Soubor: algorithms.rs</h3>
     <div class="explanation">
         <strong>Vysvětlivka:</strong> Do tohoto souboru jsem vyčlenil sdílené matematické funkce pro výpočty kontrolních číslic nezávisle na uživatelském rozhraní. Implementoval jsem zde logiky pro: <code>calculate_rc_control_digit</code> (modulo 11 pro rodná čísla), <code>modulo_10_algorithm</code> (střídavé násobení 1 a 3 pro ISBN/EAN), <code>ico_control_digit</code> (modulo 11 s váhami pro IČO) a <code>luhn_algo</code> (čísla platebních karet s iterací pozpátku a zdvojnásobením lichých pozic). Tyto funkce pak volám z UI komponent, čímž odděluji výpočetní logiku od vykreslování.
@@ -431,11 +416,9 @@ pub fn luhn_algo(number: &amp;str) -> String {
 }
 </code></pre>
 
-    <div class="page-break"></div>
-
     <h3>Soubor: rodne_cislo.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> V této komponentě zpracovávám rodné číslo. Při zadávání hodnot do textového pole (reprezentovaného signálem <code>input_value</code>) automaticky kontroluji délku řetězce. Pomocí metody <code>get()</code> bezpečně extrahuji dílčí části (rok, měsíc, den, koncovka) a ověřuji jejich numerický formát. Jakmile uživatel zadá 9 znaků, zavolám algoritmus pro výpočet kontrolní číslice a výsledek zobrazím ve formátovaných vizuálních blocích.
+        <strong>Vysvětlivka:</strong> V této komponentě zpracovávám rodné číslo. Při zadávání hodnot do textového pole (reprezentovaného signálem <code>input_value</code>) program automaticky kontroluje délku řetězce. Pomocí metody <code>get()</code> bezpečně extrahuje dílčí části (rok, měsíc, den, koncovka) a ověřuje jejich numerický formát. Jakmile uživatel zadá 9 znaků, zavolá algoritmus pro výpočet kontrolní číslice a výsledek zobrazí ve formátovaných vizuálních blocích.
     </div>
 <pre><code>use dioxus::prelude::*;
 use crate::Route;
@@ -691,11 +674,9 @@ pub fn Rodne_cislo() -> Element {
 }
 </code></pre>
 
-    <div class="page-break"></div>
-
     <h3>Soubor: isbn.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Zde zpracovávám formát ISBN. Namísto indexace fixních pozic znaků chytře využívám metodu <code>split('-')</code>, která uživatelský vstup rozdělí podle vložených pomlček do vektoru. U každého bloku pak provádím validaci číselnosti a kontroluji maximální povolenou délku pro danou sekci. Po dosažení 12 platných číslic kód zřetězím a předám ho svému algoritmu na Modulo 10.
+        <strong>Vysvětlivka:</strong> Zde zpracovávám formát ISBN. Namísto indexace fixních pozic znaků využívám metodu <code>split('-')</code>, která uživatelský vstup rozdělí podle vložených pomlček do vektoru. U každého bloku pak software provádí validaci číselnosti a kontroluje maximální povolenou délku pro danou sekci. Po dosažení 12 platných číslic program kód zřetězí a předá ho svému algoritmu na Modulo 10.
     </div>
 <pre><code>//Postup:
 /*
@@ -993,11 +974,9 @@ pub fn Isbn() -> Element {
 }
 </code></pre>
 
-    <div class="page-break"></div>
-
     <h3>Soubor: ean13.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Pro analýzu formátu EAN-13, který na rozdíl od ISBN neobsahuje oddělovače, využívám metodu přímého indexování úseků pomocí <code>get()</code> a pevných délek řetězce (Země, Výrobce, Produkt). K celkovému ověření číselného formátu jsem zvolil datový typ u64, který má dostatečnou kapacitu. Navíc jsem přidal automatické generování příslušného čárového kódu ve formátu SVG pomocí knihovny <code>barcoders</code>.
+        <strong>Vysvětlivka:</strong> Pro analýzu formátu EAN-13, který na rozdíl od ISBN neobsahuje oddělovače, využívám metodu přímého indexování úseků pomocí <code>get()</code> a pevných délek řetězce (Země, Výrobce, Produkt). K celkovému ověření číselného formátu jsem zvolil datový typ u64, který má dostatečnou kapacitu pro třináctimístná čísla. Navíc jsem přidal automatické generování příslušného čárového kódu ve formátu SVG pomocí knihovny <code>barcoders</code>.
     </div>
 <pre><code>//EAN -13
 use dioxus::prelude::*;
@@ -1231,11 +1210,9 @@ pub fn Ean13() -> Element {
 }
 </code></pre>
 
-    <div class="page-break"></div>
-
     <h3>Soubor: iban_page.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Zpracování IBAN kódů jsem realizoval za využití externí knihovny <code>iban</code>, jelikož specifikace mezinárodních bankovních formátů je poměrně komplexní. Nejdřív se snažím parsovat zadaný řetězec jako platný IBAN. Pokud se to nepovede, aplikace uměle dosadí „00“ na místo kontrolních číslic a pomocí modulo 97 sama provedu kontrolní součet a dopočítám tak chybějící dvojčíslí.
+        <strong>Vysvětlivka:</strong> Zpracování IBAN kódů jsem realizoval za využití externí knihovny <code>iban</code>, jelikož specifikace mezinárodních bankovních formátů je poměrně komplexní. Nejdřív se snažím parsovat zadaný řetězec jako platný IBAN. Pokud se to nepovede (například proto, že chybí kontrolní číslice), aplikace uměle dosadí „00“ na jejich místo a pak pomocí modulo 97 provést kontrolní součet a chybějící dvojčíslí dopočítat.
     </div>
 <pre><code>use crate::Route;
 use dioxus::prelude::*;
@@ -1514,11 +1491,9 @@ pub fn Iban_page() -&gt; Element {
 }
 </code></pre>
 
-    <div class="page-break"></div>
-
     <h3>Soubor: ico.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Tuto komponentu jsem navrhl pro analýzu Identifikačního čísla osoby (IČO). Přijímá vstup o 7 nebo 8 znacích. Pokud uživatel zadá 7 znaků, doplním a vypočítám 8. kontrolní číslici a zobrazím informativní zprávu. Pokud uživatel zadá 8 znaků, rozdělím řetězec, provedu výpočet kontrolní číslice na základě prvních sedmi znaků a porovnám jej s posledním zadaným znakem pro kompletní validaci.
+        <strong>Vysvětlivka:</strong> Tuto komponentu jsem navrhl pro analýzu Identifikačního čísla osoby (IČO). Přijímá vstup o 7 nebo 8 znacích. Pokud uživatel zadá 7 znaků, doplní a vypočítá 8. kontrolní číslici a zobrazí informativní zprávu. Pokud uživatel zadá 8 znaků, rozdělí řetězec, provede výpočet kontrolní číslice na základě prvních sedmi znaků a porovná jej s posledním zadaným znakem pro kompletní validaci.
     </div>
 <pre><code>use dioxus::prelude::*;
 use crate::Route;
@@ -1709,11 +1684,9 @@ pub fn Ico() -&gt; Element {
 }
 </code></pre>
 
-    <div class="page-break"></div>
-
     <h3>Soubor: luhn.rs</h3>
     <div class="explanation">
-        <strong>Vysvětlivka:</strong> Luhnův algoritmus zde používám k ověření platebních karet. Komponentou ověřuji numerický formát zadaného řetězce o délce 15 (v tom případě dopočítám kontrolní číslici) nebo 16 znaků (zde provádím validaci existujícího čísla). Pro přesné zjištění počtu znaků z důvodů případného budoucího formátování korektně využívám <code>chars().count()</code> namísto pouhého zjišťování bajtové délky.
+        <strong>Vysvětlivka:</strong> Luhnův algoritmus zde používám k ověření platebních karet. Komponentou ověřuji numerický formát zadaného řetězce o délce 15 (v tom případě dopočítám kontrolní číslici) nebo 16 znaků (zde provádím validaci existujícího čísla). Pro přesné zjištění počtu znaků z důvodů případného budoucího formátování využívám <code>chars().count()</code> namísto pouhého zjišťování bajtové délky.
     </div>
 <pre><code>use dioxus::prelude::*;
 use crate::Route;
