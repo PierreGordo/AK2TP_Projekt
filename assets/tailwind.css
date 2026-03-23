@@ -7,6 +7,7 @@
     'Noto Color Emoji';
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
+    --color-white: #fff;
     --spacing: 0.25rem;
     --container-3xl: 48rem;
     --container-5xl: 64rem;
@@ -834,6 +835,9 @@
   .h-12 {
     height: calc(var(--spacing) * 12);
   }
+  .min-h-\[220px\] {
+    min-height: 220px;
+  }
   .min-h-screen {
     min-height: 100vh;
   }
@@ -861,11 +865,11 @@
   .min-w-\[8rem\] {
     min-width: 8rem;
   }
-  .min-w-\[10rem\] {
-    min-width: 10rem;
-  }
   .min-w-\[12rem\] {
     min-width: 12rem;
+  }
+  .min-w-\[16rem\] {
+    min-width: 16rem;
   }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
@@ -959,6 +963,9 @@
   }
   .bg-base-300 {
     background-color: var(--color-base-300);
+  }
+  .bg-white {
+    background-color: var(--color-white);
   }
   .p-6 {
     padding: calc(var(--spacing) * 6);
@@ -1128,12 +1135,6 @@
       --btn-fg: var(--color-accent-content);
     }
   }
-  .btn-error {
-    @layer daisyui.l1.l2.l3 {
-      --btn-color: var(--color-error);
-      --btn-fg: var(--color-error-content);
-    }
-  }
   .btn-info {
     @layer daisyui.l1.l2.l3 {
       --btn-color: var(--color-info);
@@ -1217,24 +1218,19 @@
       min-width: 7rem;
     }
   }
-  .md\:min-w-\[8rem\] {
-    @media (width >= 48rem) {
-      min-width: 8rem;
-    }
-  }
   .md\:min-w-\[10rem\] {
     @media (width >= 48rem) {
       min-width: 10rem;
     }
   }
-  .md\:min-w-\[12rem\] {
-    @media (width >= 48rem) {
-      min-width: 12rem;
-    }
-  }
   .md\:min-w-\[16rem\] {
     @media (width >= 48rem) {
       min-width: 16rem;
+    }
+  }
+  .md\:min-w-\[20rem\] {
+    @media (width >= 48rem) {
+      min-width: 20rem;
     }
   }
   .md\:grid-cols-2 {

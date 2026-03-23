@@ -167,72 +167,103 @@ pub fn Isbn() -> Element {
                             r#type: "text",
                             placeholder: "Např: 978802000987",
                             //Přepínání vzhledu input fieldu pokud je error
-                            class: {if has_error 
-                            {"input input-bordered input-error text-error input-lg w-full font-mono"} 
-                            else 
-                            {"input input-bordered input-primary input-lg w-full font-mono"}},
+                            class: {
+                                if has_error {
+                                    "input input-bordered input-error text-error input-lg w-full font-mono"
+                                } else {
+                                    "input input-bordered input-primary input-lg w-full font-mono"
+                                }
+                            },
                             maxlength: "15", // 17 to account for the - symbols, but formatted cant be more than 12/13 (without the control digit 12, with its 13)
                             //value: "{input_value}",
                             oninput: move |evt| {
-                                input_value.set(evt.value());  
+                                input_value.set(evt.value());
                             },
                         }
                         //popis případného erroru
                         if has_error {
                             label { class: "label py-0",
-                                span { class: "label-text-alt text-error",
-                                    "{error_text}"
-                                }
+                                span { class: "label-text-alt text-error", "{error_text}" }
                             }
                         }
                     }
 
-					// VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ ISBN
+                    // VIZUALIZACE JEDNOTLIVÝCH ČÁSTÍ ISBN
                     div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
-                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70", "Struktura načteného ISBN" }
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70",
+                            "Struktura načteného ISBN"
+                        }
                         div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
-                            
+
                             // Prefix
                             div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_prefix}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_prefix}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Prefix" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "EAN produktový kód" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "EAN produktový kód"
+                                }
                             }
-                            
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
                             // Registrační skupina
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_group}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-secondary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_group}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Skupina" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Země / Jazyk" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Země / Jazyk"
+                                }
                             }
 
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
                             // Vydavatel
                             div { class: "flex flex-col items-center min-w-[5rem] md:min-w-[6rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publisher}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-accent bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_publisher}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Vydavatel" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Identifikátor vydavatele" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Identifikátor vydavatele"
+                                }
                             }
 
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
                             // Publikace
                             div { class: "flex flex-col items-center min-w-[6rem] md:min-w-[7rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_publication}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-info bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_publication}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Publikace" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Konkrétní kniha" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Konkrétní kniha"
+                                }
                             }
 
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
                             // Kontrolní číslice
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{isbn_check_digit}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{isbn_check_digit}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Kontrola" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Ověřovací číslice"
+                                }
                             }
                         }
                     }
@@ -259,7 +290,7 @@ pub fn Isbn() -> Element {
                         }
                     }
                 }
-
+            
             }
         }
     }

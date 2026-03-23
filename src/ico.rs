@@ -80,7 +80,9 @@ pub fn Ico() -> Element {
         div { class: "p-6 max-w-5xl mx-auto space-y-8",
             button {
                 class: "btn btn-ghost gap-2",
-                onclick: move |_| { nav.push(Route::Home {}); },
+                onclick: move |_| {
+                    nav.push(Route::Home {});
+                },
                 "Zpět na výběr"
             }
 
@@ -95,15 +97,20 @@ pub fn Ico() -> Element {
                         input {
                             r#type: "text",
                             placeholder: "Např: 25596641",
-                            class: {if has_error 
-                            {"input input-bordered input-error text-error input-lg w-full font-mono"} 
-                            else if has_success
-                            {"input input-bordered input-success text-success input-lg w-full font-mono"}
-                            else if has_info
-                            {"input input-bordered input-info text-info input-lg w-full font-mono"}
-                            else 
-                            {"input input-bordered input-primary input-lg w-full font-mono"}},
-                            oninput: move |evt| { input_value.set(evt.value()); },
+                            class: {
+                                if has_error {
+                                    "input input-bordered input-error text-error input-lg w-full font-mono"
+                                } else if has_success {
+                                    "input input-bordered input-success text-success input-lg w-full font-mono"
+                                } else if has_info {
+                                    "input input-bordered input-info text-info input-lg w-full font-mono"
+                                } else {
+                                    "input input-bordered input-primary input-lg w-full font-mono"
+                                }
+                            },
+                            oninput: move |evt| {
+                                input_value.set(evt.value());
+                            },
                             maxlength: "8",
                         }
                         if has_error {
@@ -121,25 +128,37 @@ pub fn Ico() -> Element {
                                 span { class: "label-text-alt text-info", "{info_text}" }
                             }
                         }
-
+                    
                     }
 
                     div { class: "mt-6 p-6 bg-base-200 rounded-box border border-base-300",
-                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70", "Struktura načteného IČO" }
+                        h3 { class: "text-sm font-bold uppercase tracking-widest text-center mb-6 text-base-content/70",
+                            "Struktura načteného IČO"
+                        }
                         div { class: "flex flex-wrap justify-center items-start gap-2 md:gap-4",
-                            
+
                             div { class: "flex flex-col items-center min-w-[8rem] md:min-w-[10rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ico_base}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-primary bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{ico_base}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Základní číslo" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Pořadové identifikační číslo" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Pořadové identifikační číslo"
+                                }
                             }
-                            
-                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3", "-" }
-                            
+
+                            div { class: "text-2xl md:text-3xl font-bold text-base-300 mt-2 md:mt-3",
+                                "-"
+                            }
+
                             div { class: "flex flex-col items-center min-w-[4rem] md:min-w-[5rem]",
-                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm", "{ico_cont_digit}" }
+                                div { class: "text-2xl md:text-4xl font-mono font-bold text-error bg-base-100 w-full px-2 h-12 md:h-14 flex items-center justify-center rounded shadow-sm",
+                                    "{ico_cont_digit}"
+                                }
                                 div { class: "text-xs mt-2 font-semibold", "Kontrola" }
-                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1", "Ověřovací číslice" }
+                                div { class: "text-[10px] text-base-content/60 text-center leading-tight mt-1",
+                                    "Ověřovací číslice"
+                                }
                             }
                         }
                     }
@@ -150,10 +169,18 @@ pub fn Ico() -> Element {
                 div { class: "space-y-4",
                     h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
                     div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
-                        pre { "data-prefix": ">", code { "1. Prvních 7 číslic se násobí váhami 8, 7, 6, 5, 4, 3, 2." } }
-                        pre { "data-prefix": ">", code { "2. Vypočítá se součet těchto násobků." } }
-                        pre { "data-prefix": ">", code { "3. Zbytek = Součet % 11." } }
-                        pre { "data-prefix": ">", code { "4. K = 11 - Zbytek (se speciálními pravidly pro 0, 10, 1)." } }
+                        pre { "data-prefix": ">",
+                            code { "1. Prvních 7 číslic se násobí váhami 8, 7, 6, 5, 4, 3, 2." }
+                        }
+                        pre { "data-prefix": ">",
+                            code { "2. Vypočítá se součet těchto násobků." }
+                        }
+                        pre { "data-prefix": ">",
+                            code { "3. Zbytek = Součet % 11." }
+                        }
+                        pre { "data-prefix": ">",
+                            code { "4. K = 11 - Zbytek (se speciálními pravidly pro 0, 10, 1)." }
+                        }
                     }
                 }
             }

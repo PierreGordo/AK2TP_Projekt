@@ -70,3 +70,32 @@ pub fn ico_control_digit(ico: &str) -> String {
     //Vzít číslo a převést na string
     control_digit.to_string()
 }
+
+//luhnuv algoritmus pro karty
+//celý algoritmus funguje tak, že jede číslem pozpátku, násobí liché indexy 2 a sudé přičítá bez násobení, pokud je vynásobený index větší jak 9, odečte se od něj 9
+//poté se provede (10 -(sum%10))%10; a tím vznikne kontrolní číslice
+pub fn luhn_algo(number: &str) -> String {
+    //počítám s tím, že dostanu 15 místné číslo (číslo karty bez kontrolní číslice)
+    let mut sum = 0;
+    let mut is_odd = true; // ze základu je odd, protože je odebraná kontrolní číslice a jede se pozpátku
+
+    for num in number.chars().rev() {
+        //cast charu na číslo v desítkové soustavě
+        if let Some(val) = num.to_digit(10) {
+            if is_odd {
+                let multiply = val * 2;
+                if multiply > 9 {
+                    sum += multiply - 9;
+                } else {
+                    sum += multiply;
+                }
+            } else {
+                sum += val;
+            }
+            is_odd = !is_odd;
+        }
+    }
+
+    let res = (10 - (sum % 10)) % 10;
+    res.to_string()
+}

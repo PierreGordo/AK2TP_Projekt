@@ -21,6 +21,7 @@ dependencies = [
 name = "ak2tp-projekt"
 version = "0.1.0"
 dependencies = [
+ "barcoders",
  "dioxus",
  "dioxus-primitives",
  "iban",
@@ -170,6 +171,12 @@ dependencies = [
  "tower-layer",
  "tower-service",
 ]
+
+[[package]]
+name = "barcoders"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3826fb6e98ec72c0c0db8c9a40af4932d16793021027469857e84c1b50a1e8f"
 
 [[package]]
 name = "base16"
