@@ -270,28 +270,25 @@ pub fn Isbn() -> Element {
                 }
             }
 
-            div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
-
-                // Matematický postup
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
-                    div { class: "mockup-code bg-base-300 text-base-content",
-                        pre { "data-prefix": ">",
-                            code { "ISBN-13 používá Modulo 10." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "Násobení vahou 1 a 3 na střídačku:" }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "x₁*1 + x₂*3 + x₃*1 + x₄*3 ..." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "10 - (Součet % 10) = Kontrolní číslice" }
-                        }
+            // Matematický postup
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
+                div { class: "mockup-code bg-base-300 text-base-content",
+                    pre { "data-prefix": ">",
+                        code { "ISBN-13 používá Modulo 10." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "Násobení vahou 1 a 3 na střídačku:" }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "x₁*1 + x₂*3 + x₃*1 + x₄*3 ..." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "10 - (Součet % 10) = Kontrolní číslice" }
                     }
                 }
-            
             }
+        
         }
     }
 }

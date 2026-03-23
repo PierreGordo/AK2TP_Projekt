@@ -198,7 +198,7 @@ pub fn Ean13() -> Element {
             }
 
             div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
-            	//matematický psotup
+                //matematický psotup
                 div { class: "space-y-4",
                     h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
                     div { class: "mockup-code bg-base-300 text-base-content min-h-[220px]",

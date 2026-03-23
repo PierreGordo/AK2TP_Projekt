@@ -154,26 +154,24 @@ pub fn KreditniKarta() -> Element {
                 }
             }
 
-            div { class: "grid grid-cols-1 gap-8",
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Postup výpočtu kontrolní číslice (Luhn)" }
-                    div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
-                        pre { "data-prefix": ">",
-                            code { "1. Postupuje se zprava doleva (od předposlední číslice)." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "2. Každá druhá číslice se vynásobí dvěma." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "3. Pokud je výsledek > 9, sečtou se jeho cifry (nebo se odečte 9)." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "4. Všechny číslice se sečtou." }
-                        }
-                        pre { "data-prefix": ">",
-                            code {
-                                "5. Kontrolní číslici získáme dosazením součtu do vzorce: (10 - (součet % 10)) % 10"
-                            }
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Postup výpočtu kontrolní číslice (Luhn)" }
+                div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
+                    pre { "data-prefix": ">",
+                        code { "1. Postupuje se zprava doleva (od předposlední číslice)." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "2. Každá druhá číslice se vynásobí dvěma." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "3. Pokud je výsledek > 9, sečtou se jeho cifry (nebo se odečte 9)." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "4. Všechny číslice se sečtou." }
+                    }
+                    pre { "data-prefix": ">",
+                        code {
+                            "5. Kontrolní číslici získáme dosazením součtu do vzorce: (10 - (součet % 10)) % 10"
                         }
                     }
                 }

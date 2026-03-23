@@ -230,46 +230,42 @@ pub fn Iban_page() -> Element {
             }
 
             // SPODNÍ ČÁST: POSTUP
-            div { class: "grid grid-cols-1 gap-8", // Pro IBAN dává smysl nechat na celou šířku, text je delší
 
-                // Matematický postup
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Výpočet kontrolní číslice IBAN" }
-                    div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
-                        pre { "data-prefix": ">",
-                            code {
-                                "1. Sestaví se základní řetězec: Kód banky + Číslo účtu (tzv. BBAN)."
-                            }
+            // Matematický postup
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Výpočet kontrolní číslice IBAN" }
+                div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
+                    pre { "data-prefix": ">",
+                        code {
+                            "1. Sestaví se základní řetězec: Kód banky + Číslo účtu (tzv. BBAN)."
                         }
-                        pre { "data-prefix": ">",
-                            code {
-                                "2. Na konec tohoto řetězce se připojí kód země a dvě nuly (např. 'CZ00')."
-                            }
+                    }
+                    pre { "data-prefix": ">",
+                        code {
+                            "2. Na konec tohoto řetězce se připojí kód země a dvě nuly (např. 'CZ00')."
                         }
-                        pre { "data-prefix": ">",
-                            code {
-                                "3. Všechna písmena v řetězci se převedou na čísla (A=10, B=11 ... Z=35)."
-                            }
+                    }
+                    pre { "data-prefix": ">",
+                        code {
+                            "3. Všechna písmena v řetězci se převedou na čísla (A=10, B=11 ... Z=35)."
                         }
-                        pre { "data-prefix": ">",
-                            code {
-                                "4. Vzniklé číslo se vydělí 97 a zjistí se zbytek (operace modulo)."
-                            }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "4. Vzniklé číslo se vydělí 97 a zjistí se zbytek (operace modulo)." }
+                    }
+                    pre { "data-prefix": ">",
+                        code {
+                            "5. Tento zbytek se následně odečte od čísla 98 (Výpočet: 98 - zbytek)."
                         }
-                        pre { "data-prefix": ">",
-                            code {
-                                "5. Tento zbytek se následně odečte od čísla 98 (Výpočet: 98 - zbytek)."
-                            }
+                    }
+                    pre { "data-prefix": ">",
+                        code {
+                            "6. Pokud je výsledek jednociferný, přidá se před něj nula (např. 7 -> 07)."
                         }
-                        pre { "data-prefix": ">",
-                            code {
-                                "6. Pokud je výsledek jednociferný, přidá se před něj nula (např. 7 -> 07)."
-                            }
-                        }
-                        pre { "data-prefix": ">",
-                            code {
-                                "7. Toto dvojčíslí se pak vloží hned za kód země a tím vznikne finální IBAN."
-                            }
+                    }
+                    pre { "data-prefix": ">",
+                        code {
+                            "7. Toto dvojčíslí se pak vloží hned za kód země a tím vznikne finální IBAN."
                         }
                     }
                 }

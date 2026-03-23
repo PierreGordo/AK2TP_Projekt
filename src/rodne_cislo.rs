@@ -222,30 +222,28 @@ pub fn Rodne_cislo() -> Element {
             }
 
             // SPODNÍ ČÁST: POSTUP
-            div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
 
-                // Matematický postup
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
-                    div { class: "mockup-code bg-base-300 text-base-content",
-                        pre { "data-prefix": ">",
-                            code { "Celé 10místné číslo musí být dělitelné 11." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "V programování používáme operátor % (modulo)." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "Zbytek po vydělení prvních 9 číslic číslem 11" }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "se stává kontrolní číslicí." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "Výjimka: Pokud je zbytek 10," }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "kontrolní číslice je 0." }
-                        }
+            // Matematický postup
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
+                div { class: "mockup-code bg-base-300 text-base-content",
+                    pre { "data-prefix": ">",
+                        code { "Celé 10místné číslo musí být dělitelné 11." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "V programování používáme operátor % (modulo)." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "Zbytek po vydělení prvních 9 číslic číslem 11" }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "se stává kontrolní číslicí." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "Výjimka: Pokud je zbytek 10," }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "kontrolní číslice je 0." }
                     }
                 }
             }

@@ -165,22 +165,20 @@ pub fn Ico() -> Element {
                 }
             }
 
-            div { class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
-                div { class: "space-y-4",
-                    h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
-                    div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
-                        pre { "data-prefix": ">",
-                            code { "1. Prvních 7 číslic se násobí váhami 8, 7, 6, 5, 4, 3, 2." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "2. Vypočítá se součet těchto násobků." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "3. Zbytek = Součet % 11." }
-                        }
-                        pre { "data-prefix": ">",
-                            code { "4. K = 11 - Zbytek (se speciálními pravidly pro 0, 10, 1)." }
-                        }
+            div { class: "space-y-4",
+                h3 { class: "text-xl font-bold", "Matematický postup výpočtu" }
+                div { class: "mockup-code bg-base-300 text-base-content overflow-x-auto",
+                    pre { "data-prefix": ">",
+                        code { "1. Prvních 7 číslic se násobí váhami 8, 7, 6, 5, 4, 3, 2." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "2. Vypočítá se součet těchto násobků." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "3. Zbytek = Součet % 11." }
+                    }
+                    pre { "data-prefix": ">",
+                        code { "4. K = 11 - Zbytek (se speciálními pravidly pro 0, 10, 1)." }
                     }
                 }
             }
