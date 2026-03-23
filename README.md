@@ -1,4 +1,4 @@
-# Program na validaci kontrolních číslic
+# Program na kalkulaci a validaci kontrolních číslic
 
 Interaktivní webová aplikace postavená na jazyce Rust (za použití frameworku [Dioxus](https://dioxuslabs.com/)) umožňující analýzu a generování kontrolních číslic pro běžně používané identifikátory a standardní kódy. Cílem projektu je demonstrovat využití modulo aritmetiky jako obrany proti chybám a překlepům.
 
