@@ -4,7 +4,8 @@
 
 # HTML title tag content
 title = "ak2tp-projekt"
-base_path = "/AK2TP_Projekt"
+# base_path = "/AK2TP_Projekt"
+#toto bude třeba odkomentovat před finálním commitem na git
 
 # include `assets` in web platform
 [web.resource]

@@ -105,6 +105,21 @@ fn Home() -> Element {
                             "IBAN"
                         
                         }
+                        button {
+                            class: "btn btn-outline btn-success btn-lg",
+                            // onclick: move |_| { nav.push(Route::Ico {}); },
+                            "IČO (Identifikační číslo osoby)"
+                        }
+                        button {
+                            class: "btn btn-outline btn-warning btn-lg",
+                            // onclick: move |_| { nav.push(Route::Luhn {}); },
+                            "Luhnův algoritmus (Karty a IMEI)"
+                        }
+                        button {
+                            class: "btn btn-outline btn-error btn-lg",
+                            // onclick: move |_| { nav.push(Route::Mrz {}); },
+                            "MRZ (Strojově čitelná zóna pasů)"
+                        }
                     }
                 }
             }
